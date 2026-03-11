@@ -80,6 +80,8 @@
       color: var(--green);
       border-radius: 4px;
       transition: background 0.15s, color 0.15s;
+      flex: 1;
+      text-align: center;
     }
 
     .download-bar a:hover {
@@ -97,12 +99,6 @@
       border-color: var(--accent);
     }
 
-    .buy-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     .buy-btn {
       display: inline-block;
       padding: 0.5rem 1.25rem;
@@ -113,12 +109,15 @@
       background: var(--green);
       color: var(--bg);
       cursor: default;
+      text-decoration: none;
+      flex: 1;
+      text-align: center;
     }
 
     .coming-soon {
       font-size: 0.65rem;
-      color: var(--dim);
-      margin-top: 0.25rem;
+      color: var(--bg);
+      opacity: 0.7;
     }
 
     section {
@@ -326,10 +325,7 @@
     </div>
 
     <div class="download-bar">
-      <span class="buy-wrapper">
-        <span class="primary buy-btn">Buy</span>
-        <span class="coming-soon">coming soon</span>
-      </span>
+      <span class="buy-btn">Buy <span class="coming-soon">(coming soon)</span></span>
       <a href="api.html" class="api-link">Full API Reference</a>
     </div>
 
