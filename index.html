@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino8 - Fantasy Console</title>
+  <style>
+    :root {
+      --bg: #140C1C;
+      --bg2: #1a1228;
+      --text: #DEEED6;
+      --dim: #8595A1;
+      --accent: #6DC2CA;
+      --green: #6DAA2C;
+      --orange: #D27D2C;
+      --red: #D04648;
+      --blue: #597DCE;
+      --yellow: #DAD45E;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 0 2rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    header .tagline {
+      color: var(--dim);
+      font-size: 0.95rem;
+    }
+
+    header .version {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.75rem;
+      color: var(--yellow);
+      border: 1px solid var(--yellow);
+      border-radius: 3px;
+    }
+
+    .download-bar {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .download-bar a {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      text-decoration: none;
+      border: 2px solid var(--green);
+      color: var(--green);
+      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .download-bar a:hover {
+      background: var(--green);
+      color: var(--bg);
+    }
+
+    .download-bar a.primary {
+      background: var(--green);
+      color: var(--bg);
+    }
+
+    .download-bar a.primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    section {
+      margin: 2.5rem 0;
+    }
+
+    section h2 {
+      font-size: 1.1rem;
+      color: var(--orange);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    section p {
+      color: var(--dim);
+      margin-bottom: 0.75rem;
+    }
+
+    pre {
+      background: var(--bg2);
+      border: 1px solid #2a2040;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    code { color: var(--text); }
+    .c-comment { color: var(--dim); }
+    .c-cmd { color: var(--accent); }
+    .c-arg { color: var(--yellow); }
+    .c-str { color: var(--green); }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .features { grid-template-columns: 1fr; }
+    }
+
+    .feature {
+      background: var(--bg2);
+      border: 1px solid #2a2040;
+      border-radius: 4px;
+      padding: 1rem;
+    }
+
+    .feature h3 {
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+
+    .feature p {
+      font-size: 0.8rem;
+      color: var(--dim);
+      margin: 0;
+    }
+
+    .api-sample {
+      font-size: 0.85rem;
+    }
+
+    .api-sample .c-kw { color: var(--red); }
+    .api-sample .c-fn { color: var(--accent); }
+    .api-sample .c-num { color: var(--orange); }
+
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 500px) {
+      .install-grid { grid-template-columns: 1fr; }
+    }
+
+    .install-grid .platform {
+      background: var(--bg2);
+      border: 1px solid #2a2040;
+      border-radius: 4px;
+      padding: 0.75rem;
+    }
+
+    .install-grid .platform h3 {
+      font-size: 0.8rem;
+      color: var(--yellow);
+      margin-bottom: 0.35rem;
+    }
+
+    .install-grid .platform code {
+      font-size: 0.75rem;
+      color: var(--dim);
+      word-break: break-all;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 0 2rem;
+      color: #4E4A4E;
+      font-size: 0.75rem;
+    }
+
+    footer a {
+      color: var(--dim);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .palette-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+
+    .palette-bar span {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DINO8</h1>
+      <div class="tagline">A minimal retro fantasy console</div>
+      <span class="version">v0.3.1</span>
+    </header>
+
+    <div class="palette-bar">
+      <span style="background:#140C1C"></span>
+      <span style="background:#442434"></span>
+      <span style="background:#30346D"></span>
+      <span style="background:#4E4A4E"></span>
+      <span style="background:#854C30"></span>
+      <span style="background:#346524"></span>
+      <span style="background:#D04648"></span>
+      <span style="background:#757161"></span>
+      <span style="background:#597DCE"></span>
+      <span style="background:#D27D2C"></span>
+      <span style="background:#8595A1"></span>
+      <span style="background:#6DAA2C"></span>
+      <span style="background:#D2AA99"></span>
+      <span style="background:#6DC2CA"></span>
+      <span style="background:#DAD45E"></span>
+      <span style="background:#DEEED6"></span>
+    </div>
+
+    <div class="download-bar">
+      <a href="https://github.com/Pomb/dino8/releases/latest" class="primary">Download Latest</a>
+      <a href="https://github.com/Pomb/dino8">Source on GitHub</a>
+    </div>
+
+    <section>
+      <p>Dino8 is a fantasy console engine written in C with Lua scripting. Write games with a small, focused API for drawing pixels, handling input, playing audio, and managing tilemaps &mdash; then package and share them on the web or desktop.</p>
+    </section>
+
+    <section>
+      <h2>FEATURES</h2>
+      <div class="features">
+        <div class="feature">
+          <h3>Lua Scripting</h3>
+          <p>Write game logic in Lua 5.4 with hot reload during development.</p>
+        </div>
+        <div class="feature">
+          <h3>16-Color Palette</h3>
+          <p>Dawnbringer 16 default palette with custom palette support.</p>
+        </div>
+        <div class="feature">
+          <h3>Pixel Graphics</h3>
+          <p>Sprites, shapes, tilemaps, camera, clipping, and render targets.</p>
+        </div>
+        <div class="feature">
+          <h3>Audio</h3>
+          <p>Music and sound effects with named clips, pitch, and volume control.</p>
+        </div>
+        <div class="feature">
+          <h3>Web Export</h3>
+          <p>Bundle games into a single HTML file. Push to itch.io with one command.</p>
+        </div>
+        <div class="feature">
+          <h3>Packaging</h3>
+          <p>Create <code>.fos</code> packages for distribution. Validate and inspect projects.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>QUICK START</h2>
+<pre><span class="c-comment"># install dependencies (macOS)</span>
+<span class="c-cmd">brew install</span> <span class="c-arg">sdl2 sdl2_ttf sdl2_image sdl2_mixer lua@5.4 libzip</span>
+
+<span class="c-comment"># build</span>
+<span class="c-cmd">git clone</span> <span class="c-str">https://github.com/Pomb/dino8.git</span>
+<span class="c-cmd">cd</span> dino8 && <span class="c-cmd">make</span>
+
+<span class="c-comment"># create a new game</span>
+<span class="c-cmd">./build/dino8</span> <span class="c-arg">create</span> my-game
+
+<span class="c-comment"># run it</span>
+<span class="c-cmd">./build/dino8</span> <span class="c-arg">my-game/</span></pre>
+    </section>
+
+    <section>
+      <h2>API SAMPLE</h2>
+<pre class="api-sample"><span class="c-kw">function</span> <span class="c-fn">_init</span>()
+  x, y = <span class="c-num">64</span>, <span class="c-num">64</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-num">0</span>) <span class="c-kw">then</span> x = x - <span class="c-num">1</span> <span class="c-kw">end</span>
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-num">1</span>) <span class="c-kw">then</span> x = x + <span class="c-num">1</span> <span class="c-kw">end</span>
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-num">2</span>) <span class="c-kw">then</span> y = y - <span class="c-num">1</span> <span class="c-kw">end</span>
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-num">3</span>) <span class="c-kw">then</span> y = y + <span class="c-num">1</span> <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>()
+  <span class="c-fn">circ</span>(x, y, <span class="c-num">4</span>, <span class="c-num">7</span>)
+  <span class="c-fn">print</span>(<span class="c-str">"hello dino8"</span>, <span class="c-num">40</span>, <span class="c-num">10</span>, <span class="c-num">14</span>)
+<span class="c-kw">end</span></pre>
+    </section>
+
+    <section>
+      <h2>CLI</h2>
+<pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game/</span>              <span class="c-comment"># run a project</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">my-game.fos</span>           <span class="c-comment"># run a package</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">create</span> my-game        <span class="c-comment"># scaffold a new game</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">fossilize</span> my-game     <span class="c-comment"># create .fos package</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">validate</span> my-game/     <span class="c-comment"># check project structure</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">export web</span> my-game/   <span class="c-comment"># single-file HTML export</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">push</span> my-game/         <span class="c-comment"># publish to itch.io</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">help</span>                  <span class="c-comment"># all commands</span></pre>
+    </section>
+
+    <section>
+      <h2>INSTALL DEPENDENCIES</h2>
+      <div class="install-grid">
+        <div class="platform">
+          <h3>macOS</h3>
+          <code>brew install sdl2 sdl2_ttf sdl2_image sdl2_mixer lua@5.4 libzip</code>
+        </div>
+        <div class="platform">
+          <h3>Ubuntu / Debian</h3>
+          <code>sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev liblua5.4-dev libzip-dev</code>
+        </div>
+        <div class="platform">
+          <h3>Arch Linux</h3>
+          <code>sudo pacman -S sdl2 sdl2_ttf sdl2_image sdl2_mixer lua libzip</code>
+        </div>
+        <div class="platform">
+          <h3>Windows (MSYS2)</h3>
+          <code>pacman -S mingw-w64-x86_64-{gcc,SDL2,SDL2_ttf,SDL2_image,SDL2_mixer,lua,libzip}</code>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="https://github.com/Pomb/dino8">GitHub</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/Pomb/dino8/releases">Releases</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/Pomb/dino8/issues">Issues</a>
+    </footer>
+  </div>
+</body>
+</html>
