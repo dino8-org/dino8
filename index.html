@@ -367,7 +367,7 @@
   <div class="container">
     <header>
       <h1>DINO8</h1>
-      <span class="version">v0.3.1</span>
+      <span class="version" id="versionBadge">...</span>
       <div class="tagline">A minimal retro game engine</div>
     </header>
 
@@ -610,6 +610,17 @@
     document.getElementById('codeInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') submitCode();
     });
+
+    // Fetch latest version from worker
+    fetch(`${WORKER_URL}/version`)
+      .then(r => r.json())
+      .then(data => {
+        const badge = document.getElementById('versionBadge');
+        badge.textContent = data.version ? `v${data.version}` : 'preview';
+      })
+      .catch(() => {
+        document.getElementById('versionBadge').textContent = 'preview';
+      });
   </script>
 </body>
 </html>
