@@ -256,6 +256,71 @@
     .code-msg.error { color: var(--red); }
     .code-msg.success { color: var(--green); }
 
+    .download-progress {
+      margin-top: 0.75rem;
+      width: 100%;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .download-progress .progress-bar {
+      height: 8px;
+      background: #2a2040;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .download-progress .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      border-radius: 4px;
+      transition: width 0.15s ease;
+    }
+
+    .download-progress .progress-text {
+      font-size: 0.7rem;
+      color: var(--dim);
+      margin-top: 0.3rem;
+    }
+
+    .post-download {
+      margin-top: 0.75rem;
+      text-align: left;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .post-download .thanks {
+      color: var(--green);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .post-download .setup-hint {
+      font-size: 0.78rem;
+      color: var(--dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .post-download pre {
+      font-size: 0.78rem;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-download a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .post-download a:hover {
+      text-decoration: underline;
+    }
+
     section {
       margin: 2.5rem 0;
     }
@@ -361,10 +426,12 @@
 
     .palette-bar {
       display: flex;
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 2rem 0;
+      height: 3px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
     }
 
     .palette-bar span {
@@ -450,7 +517,7 @@
       </div>
     </section>
 
-    <section>
+    <section id="getting-started">
       <h2>GETTING STARTED</h2>
 <pre><span class="c-comment"># create a new game</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">create</span> my-game
@@ -479,7 +546,7 @@
 <span class="c-kw">end</span></pre>
     </section>
 
-    <section>
+    <section id="cli">
       <h2>CLI</h2>
 <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game/</span>              <span class="c-comment"># run a project</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">my-game.fos</span>           <span class="c-comment"># run a package</span>
@@ -585,7 +652,27 @@
 
     async function downloadBuild(platform) {
       const msg = document.getElementById('codeMsg');
-      msg.textContent = 'Starting download...';
+      const linksEl = document.getElementById('downloadLinks');
+      const earlyAccess = document.getElementById('earlyAccess');
+
+      // Hide platform links and show progress bar
+      linksEl.style.display = 'none';
+      msg.textContent = '';
+      msg.className = 'code-msg';
+
+      let progressEl = document.getElementById('downloadProgress');
+      if (!progressEl) {
+        progressEl = document.createElement('div');
+        progressEl.id = 'downloadProgress';
+        progressEl.className = 'download-progress';
+        progressEl.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="progress-text" id="progressText">Downloading...</div>';
+        earlyAccess.appendChild(progressEl);
+      }
+      progressEl.style.display = 'block';
+      const fill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      fill.style.width = '0%';
+      progressText.textContent = 'Downloading...';
 
       try {
         const res = await fetch(`${WORKER_URL}/download`, {
@@ -598,29 +685,115 @@
           const err = await res.json();
           msg.textContent = err.error || 'Download failed.';
           msg.className = 'code-msg error';
+          progressEl.style.display = 'none';
+          linksEl.style.display = 'flex';
           return;
         }
 
-        const blob = await res.blob();
         const disposition = res.headers.get('Content-Disposition') || '';
-        const match = disposition.match(/filename="(.+)"/);
-        const filename = match ? match[1] : `dino8-${platform}.zip`;
+        const fnMatch = disposition.match(/filename="(.+)"/);
+        const filename = fnMatch ? fnMatch[1] : `dino8-${platform}.zip`;
+        const contentLength = res.headers.get('Content-Length');
+        const total = contentLength ? parseInt(contentLength, 10) : 0;
 
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+        if (total && res.body) {
+          const reader = res.body.getReader();
+          const chunks = [];
+          let received = 0;
 
-        msg.textContent = 'Download started!';
-        msg.className = 'code-msg success';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+            const pct = Math.min(Math.round((received / total) * 100), 100);
+            fill.style.width = pct + '%';
+            const mb = (received / (1024 * 1024)).toFixed(1);
+            const totalMb = (total / (1024 * 1024)).toFixed(1);
+            progressText.textContent = `${mb} MB / ${totalMb} MB (${pct}%)`;
+          }
+
+          const blob = new Blob(chunks);
+          triggerDownload(blob, filename);
+        } else {
+          // Fallback: no content-length, simulate progress
+          fill.style.transition = 'width 2s ease';
+          fill.style.width = '80%';
+          const blob = await res.blob();
+          fill.style.transition = 'width 0.15s ease';
+          fill.style.width = '100%';
+          triggerDownload(blob, filename);
+        }
+
+        progressText.textContent = 'Complete!';
+        fill.style.width = '100%';
+
+        // After a brief moment, show post-download message
+        setTimeout(() => {
+          progressEl.style.display = 'none';
+          showPostDownload(platform, filename);
+        }, 600);
+
       } catch {
         msg.textContent = 'Download failed. Try again.';
         msg.className = 'code-msg error';
+        progressEl.style.display = 'none';
+        linksEl.style.display = 'flex';
       }
+    }
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function showPostDownload(platform, filename) {
+      const earlyAccess = document.getElementById('earlyAccess');
+      const msg = document.getElementById('codeMsg');
+      msg.textContent = '';
+      msg.className = 'code-msg';
+
+      let postEl = document.getElementById('postDownload');
+      if (postEl) postEl.remove();
+
+      const isWindows = platform.startsWith('windows');
+      const ext = filename.endsWith('.tar.gz') ? 'tar.gz' : 'zip';
+
+      let extractCmd, aliasHint;
+      if (isWindows) {
+        extractCmd = `<span class="c-comment"># extract and add to PATH</span>\n<span class="c-comment"># unzip ${filename} to a folder, e.g. C:\\dino8</span>\n<span class="c-comment"># then add that folder to your system PATH</span>`;
+        aliasHint = 'Add the folder containing <code>dino8.exe</code> to your system PATH so you can run it from any terminal.';
+      } else {
+        const dir = platform.startsWith('macos') ? '~/dino8' : '~/dino8';
+        const unzipCmd = ext === 'tar.gz'
+          ? `<span class="c-cmd">tar</span> <span class="c-arg">xzf</span> ${filename} <span class="c-arg">-C</span> ${dir}`
+          : `<span class="c-cmd">unzip</span> ${filename} <span class="c-arg">-d</span> ${dir}`;
+        extractCmd = `<span class="c-comment"># extract</span>\n<span class="c-cmd">mkdir</span> <span class="c-arg">-p</span> ${dir}\n${unzipCmd}`;
+        aliasHint = `Add an alias so <code>dino8</code> is available everywhere:`;
+      }
+
+      const aliasBlock = isWindows ? '' : `
+        <pre><span class="c-comment"># add to ~/.zshrc or ~/.bashrc</span>
+<span class="c-cmd">alias</span> <span class="c-arg">dino8</span>=<span class="c-str">"~/dino8/dino8"</span></pre>`;
+
+      postEl = document.createElement('div');
+      postEl.id = 'postDownload';
+      postEl.className = 'post-download';
+      postEl.innerHTML = `
+        <div class="thanks">Thanks for downloading Dino8!</div>
+        <p class="setup-hint">Set up your environment:</p>
+        <pre>${extractCmd}</pre>
+        <p class="setup-hint">${aliasHint}</p>
+        ${aliasBlock}
+        <p class="setup-hint">Then get started &mdash; <a href="#cli">see the CLI reference below</a>.</p>
+      `;
+      earlyAccess.appendChild(postEl);
     }
 
     document.getElementById('codeInput').addEventListener('keydown', function(e) {

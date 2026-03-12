@@ -78,7 +78,7 @@
 
     main {
       flex: 1;
-      max-width: 860px;
+      min-width: 0;
       padding: 2rem 2.5rem;
     }
 
@@ -150,7 +150,6 @@
 
     .palette-strip {
       display: flex;
-      height: 20px;
       border-radius: 3px;
       overflow: hidden;
       margin: 0.5rem 0;
@@ -158,17 +157,22 @@
 
     .palette-strip span {
       flex: 1;
-      position: relative;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #140C1C;
     }
 
-    .palette-strip span::after {
-      content: attr(data-i);
-      position: absolute;
-      bottom: 1px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 8px;
-      color: rgba(0,0,0,0.6);
+    .palette-strip span:first-child {
+      color: #DEEED6;
+    }
+
+    .palette-strip span:nth-child(2),
+    .palette-strip span:nth-child(3) {
+      color: #DEEED6;
     }
 
     .search-box {
@@ -264,6 +268,153 @@
     .conf-example .c-num { color: var(--orange); }
     .conf-example .c-comment { color: var(--dim); }
 
+    #conf {
+      margin-right: -2.5rem;
+    }
+
+    #conf > h2 {
+      padding-right: 2.5rem;
+    }
+
+    .conf-split {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+    }
+
+    .conf-split .conf-docs {
+      flex: 1;
+      min-width: 0;
+      padding-right: 2rem;
+    }
+
+    .conf-split .conf-full-example {
+      position: sticky;
+      top: 0;
+      flex: 0 0 30vw;
+      max-width: 30vw;
+      max-height: 100vh;
+      overflow-y: auto;
+      background: #12101c;
+      border-left: 1px solid #2a2040;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .conf-full-example .example-label {
+      font-size: 0.7rem;
+      color: var(--orange);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .conf-full-example pre {
+      font-size: 0.75rem;
+      line-height: 1.45;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+    }
+
+    @media (max-width: 1000px) {
+      #conf {
+        margin-right: 0;
+      }
+      #conf > h2 {
+        padding-right: 0;
+      }
+      .conf-split {
+        flex-direction: column;
+      }
+      .conf-split .conf-docs {
+        flex: 1;
+        padding-right: 0;
+      }
+      .conf-split .conf-full-example {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        max-height: none;
+        border-left: none;
+        border-top: 1px solid #2a2040;
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+      }
+    }
+
+    .section-with-example {
+      margin-right: -2.5rem;
+    }
+
+    .section-with-example > h2 {
+      padding-right: 2.5rem;
+    }
+
+    .section-split {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+    }
+
+    .section-split .section-docs {
+      flex: 1;
+      min-width: 0;
+      padding-right: 2rem;
+    }
+
+    .section-split .section-example {
+      position: sticky;
+      top: 0;
+      flex: 0 0 30vw;
+      max-width: 30vw;
+      max-height: 100vh;
+      overflow-y: auto;
+      background: #12101c;
+      border-left: 1px solid #2a2040;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .section-example .example-label {
+      font-size: 0.7rem;
+      color: var(--orange);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-example pre {
+      font-size: 0.75rem;
+      line-height: 1.45;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+    }
+
+    @media (max-width: 1000px) {
+      .section-with-example {
+        margin-right: 0;
+      }
+      .section-with-example > h2 {
+        padding-right: 0;
+      }
+      .section-split {
+        flex-direction: column;
+      }
+      .section-split .section-example {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        max-height: none;
+        border-left: none;
+        border-top: 1px solid #2a2040;
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+      }
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 700px) {
@@ -287,11 +438,11 @@
         <input type="text" id="search" placeholder="Search API..." autocomplete="off" spellcheck="false">
         <div class="search-hint" id="search-hint"></div>
       </div>
-      <h3>PROJECT</h3>
-      <a href="#conf">Configuration</a>
       <h3>CORE</h3>
       <a href="#globals">Globals</a>
       <a href="#callbacks">Callbacks</a>
+      <h3>PROJECT</h3>
+      <a href="#conf">Configuration</a>
       <h3>GRAPHICS</h3>
       <a href="#drawing">Drawing</a>
       <a href="#palette">Palette</a>
@@ -334,26 +485,68 @@
         <p>Complete Lua API for the Dino8 game engine.</p>
       </header>
 
+      <!-- GLOBALS -->
+      <div class="section" id="globals">
+        <h2>GLOBALS</h2>
+        <div class="global">
+          <span class="global-name">T</span> <span class="global-type">number</span>
+          <div class="global-desc">Time in seconds since startup</div>
+        </div>
+        <div class="global">
+          <span class="global-name">DT</span> <span class="global-type">number</span>
+          <div class="global-desc">Delta time between frames in seconds</div>
+        </div>
+        <div class="global">
+          <span class="global-name">PLATFORM</span> <span class="global-type">table</span>
+          <div class="global-desc">.name ("desktop"|"mobile"|"web"), .os, .is_mobile, .is_web, .is_desktop</div>
+        </div>
+        <div class="global">
+          <span class="global-name">INPUT_GLYPH</span> <span class="global-type">table</span>
+          <div class="global-desc">.UP .DOWN .LEFT .RIGHT .ACTION_A .ACTION_B .ESCAPE &mdash; context-aware input icons</div>
+        </div>
+        <div class="global">
+          <span class="global-name">CONFIG</span> <span class="global-type">table</span>
+          <div class="global-desc">Read-only table of all conf.lua values: .title, .version, .width, .height, .author, .assets, etc.</div>
+        </div>
+      </div>
+
+      <!-- CALLBACKS -->
+      <div class="section" id="callbacks">
+        <h2>CALLBACKS</h2>
+        <div class="note">Define these functions in your game. The engine calls them automatically.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_init</span>()</div>
+          <div class="fn-desc">Called once at startup for initialization</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_update</span>()</div>
+          <div class="fn-desc">Called every frame to update game logic</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_render</span>()</div>
+          <div class="fn-desc">Called every frame to render world graphics (affected by camera)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_ui</span>()</div>
+          <div class="fn-desc">Called every frame to render UI (NOT affected by camera)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_orientation_changed</span>(<span class="fn-param">orientation</span>)</div>
+          <div class="fn-desc">Called when device orientation changes. orientation: "portrait" | "landscape"</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_input_changed</span>(<span class="fn-param">mode</span>)</div>
+          <div class="fn-desc">Called when input mode changes. mode: "keyboard" | "touch" | "gamepad"</div>
+        </div>
+      </div>
+
       <!-- CONFIGURATION -->
       <div class="section" id="conf">
         <h2>CONFIGURATION</h2>
-        <div class="note">Every project has a <code>conf.lua</code> that returns a table describing the game. This is where you set the title, resolution, assets, filters, and more.</div>
 
-<pre class="conf-example"><span class="c-kw">return</span> {
-  title       = <span class="c-str">"my-game"</span>,
-  author      = <span class="c-str">"you"</span>,
-  version     = <span class="c-str">"1.0.0"</span>,
-  width       = <span class="c-num">128</span>,
-  height      = <span class="c-num">128</span>,
-  scale       = <span class="c-num">4</span>,
-  entry       = <span class="c-str">"main.d8"</span>,
-
-  assets = {
-    sprites = <span class="c-str">"assets/sprites.png"</span>,
-    map     = <span class="c-str">"assets/map.json"</span>,
-    music   = { <span class="c-str">"assets/music/*.wav"</span> },
-  },
-}</pre>
+        <div class="conf-split">
+          <div class="conf-docs">
+        <div class="note">Every project has a <code>conf.lua</code> that returns a table describing the game. This is where you set the title, resolution, assets, filters, and more. All values are available at runtime via the read-only <code>CONFIG</code> global &mdash; e.g. <code>CONFIG.title</code>, <code>CONFIG.version</code>, <code>CONFIG.width</code>.</div>
 
         <h3 class="conf-subsection">Metadata</h3>
         <table class="conf-table">
@@ -389,18 +582,6 @@
 
         <h3 class="conf-subsection">SFX Clips</h3>
         <div class="fn-desc" style="margin-bottom:0.5rem">Named sound effect clips with optional randomized pitch and volume.</div>
-<pre class="conf-example">sfx_clips = {
-  jump = {
-    path   = <span class="c-str">"assets/sfx/jump_*.wav"</span>,
-    pitch  = { <span class="c-num">0.9</span>, <span class="c-num">1.1</span> },
-    volume = <span class="c-num">0.5</span>,
-  },
-  menu = {
-    navigate = <span class="c-str">"click"</span>,
-    select   = <span class="c-str">"confirm"</span>,
-    back     = <span class="c-str">"cancel"</span>,
-  },
-}</pre>
         <table class="conf-table">
           <tr><th>Field</th><th>Default</th><th>Description</th></tr>
           <tr><td>sfx_clips.&lt;name&gt;.path</td><td>&mdash;</td><td>Wildcard path to sound files (e.g. <code>"sfx/hit_*.wav"</code>).</td></tr>
@@ -412,7 +593,7 @@
         </table>
 
         <h3 class="conf-subsection">Filters</h3>
-        <div class="fn-desc" style="margin-bottom:0.5rem">Post-processing filters applied to the rendered frame.</div>
+        <div class="fn-desc" style="margin-bottom:0.5rem">Post-processing filters applied to the rendered frame. Filters can also be toggled and adjusted at runtime via the built-in settings screen.</div>
         <table class="conf-table">
           <tr><th>Field</th><th>Default</th><th>Description</th></tr>
           <tr><td>filters.upscale.type</td><td>none</td><td>Upscale filter: <code>"scale2x"</code>, <code>"hq2x"</code>, <code>"hq3x"</code>, <code>"hq4x"</code>, or <code>"xbrz"</code>.</td></tr>
@@ -427,13 +608,13 @@
 
         <h3 class="conf-subsection">Custom Palette</h3>
         <div class="fn-desc" style="margin-bottom:0.5rem">Replace the default Dawnbringer 16 palette with your own colors (max 254).</div>
-<pre class="conf-example">palette = { <span class="c-num">0x000000</span>, <span class="c-num">0x1D2B53</span>, <span class="c-num">0x7E2553</span>, <span class="c-num">0x008751</span>, <span class="c-comment">-- ...</span> }</pre>
+        <table class="conf-table">
+          <tr><th>Field</th><th>Default</th><th>Description</th></tr>
+          <tr><td>palette</td><td>Dawnbringer 16</td><td>Array of colors in <code>0xRRGGBB</code> format. Up to 254 entries.</td></tr>
+        </table>
 
         <h3 class="conf-subsection">Custom Fonts</h3>
-        <div class="fn-desc" style="margin-bottom:0.5rem">Load additional font styles (indices 1&ndash;2 are reserved for the built-in font).</div>
-<pre class="conf-example">font_styles = {
-  { font = <span class="c-str">"assets/myfont.ttf"</span>, size = <span class="c-num">12</span>, line_height = <span class="c-num">14</span>, kerning = <span class="c-num">0</span> },
-}</pre>
+        <div class="fn-desc" style="margin-bottom:0.5rem">Load additional font styles. Indices 1&ndash;2 are reserved for the built-in font, so the first user-defined entry starts at index 3: <code>font_style(3)</code>.</div>
         <table class="conf-table">
           <tr><th>Field</th><th>Default</th><th>Description</th></tr>
           <tr><td>font_styles[n].font</td><td>&mdash;</td><td>Path to a TTF font file.</td></tr>
@@ -458,57 +639,128 @@
           <tr><td>itch.game</td><td>nil</td><td>Your itch.io game slug.</td></tr>
           <tr><td>itch.channel</td><td>"html5"</td><td>Upload channel.</td></tr>
         </table>
-      </div>
 
-      <!-- GLOBALS -->
-      <div class="section" id="globals">
-        <h2>GLOBALS</h2>
-        <div class="global">
-          <span class="global-name">T</span> <span class="global-type">number</span>
-          <div class="global-desc">Time in seconds since startup</div>
-        </div>
-        <div class="global">
-          <span class="global-name">DT</span> <span class="global-type">number</span>
-          <div class="global-desc">Delta time between frames in seconds</div>
-        </div>
-        <div class="global">
-          <span class="global-name">PLATFORM</span> <span class="global-type">table</span>
-          <div class="global-desc">.name ("desktop"|"mobile"|"web"), .os, .is_mobile, .is_web, .is_desktop</div>
-        </div>
-        <div class="global">
-          <span class="global-name">INPUT_GLYPH</span> <span class="global-type">table</span>
-          <div class="global-desc">.UP .DOWN .LEFT .RIGHT .ACTION_A .ACTION_B .ESCAPE &mdash; context-aware input icons</div>
-        </div>
-      </div>
+          </div><!-- /conf-docs -->
 
-      <!-- CALLBACKS -->
-      <div class="section" id="callbacks">
-        <h2>CALLBACKS</h2>
-        <div class="note">Define these functions in your game. The engine calls them automatically.</div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_init</span>()</div>
-          <div class="fn-desc">Called once at startup for initialization</div>
-        </div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_update</span>()</div>
-          <div class="fn-desc">Called every frame to update game logic</div>
-        </div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_render</span>()</div>
-          <div class="fn-desc">Called every frame to render world graphics (affected by camera)</div>
-        </div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_ui</span>()</div>
-          <div class="fn-desc">Called every frame to render UI (NOT affected by camera)</div>
-        </div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_orientation_changed</span>(<span class="fn-param">orientation</span>)</div>
-          <div class="fn-desc">Called when device orientation changes. orientation: "portrait" | "landscape"</div>
-        </div>
-        <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_input_changed</span>(<span class="fn-param">mode</span>)</div>
-          <div class="fn-desc">Called when input mode changes. mode: "keyboard" | "touch" | "gamepad"</div>
-        </div>
+          <div class="conf-full-example">
+            <div class="example-label">FULL EXAMPLE</div>
+<pre class="conf-example"><span class="c-kw">return</span> {
+  <span class="c-comment">-- metadata</span>
+  title       = <span class="c-str">"dino-quest"</span>,
+  author      = <span class="c-str">"doodleclan"</span>,
+  version     = <span class="c-str">"1.2.0"</span>,
+  description = <span class="c-str">"A tiny dino adventure"</span>,
+  type        = <span class="c-str">"game"</span>,
+  tags        = { <span class="c-str">"platformer"</span>, <span class="c-str">"retro"</span> },
+  thumbnail   = <span class="c-str">"assets/thumb.png"</span>,
+  entry       = <span class="c-str">"main.d8"</span>,
+
+  <span class="c-comment">-- display</span>
+  width      = <span class="c-num">256</span>,
+  height     = <span class="c-num">144</span>,
+  scale      = <span class="c-num">3</span>,
+  fullscreen = <span class="c-kw">false</span>,
+  speed      = <span class="c-num">1.0</span>,
+  gif_scale  = <span class="c-num">2</span>,
+
+  <span class="c-comment">-- assets</span>
+  assets = {
+    sprites = <span class="c-str">"assets/sprites.png"</span>,
+    map     = <span class="c-str">"assets/world.json"</span>,
+    music   = {
+      <span class="c-str">"assets/music/title.ogg"</span>,
+      <span class="c-str">"assets/music/level*.ogg"</span>,
+    },
+  },
+
+  <span class="c-comment">-- sound effects</span>
+  sfx_clips = {
+    jump = {
+      path   = <span class="c-str">"assets/sfx/jump_*.wav"</span>,
+      pitch  = { <span class="c-num">0.9</span>, <span class="c-num">1.1</span> },
+      volume = <span class="c-num">0.7</span>,
+    },
+    land = {
+      path   = <span class="c-str">"assets/sfx/land.wav"</span>,
+      pitch  = <span class="c-num">1.0</span>,
+      volume = { <span class="c-num">0.4</span>, <span class="c-num">0.6</span> },
+    },
+    coin = {
+      path   = <span class="c-str">"assets/sfx/coin*.wav"</span>,
+      pitch  = { <span class="c-num">0.95</span>, <span class="c-num">1.05</span> },
+    },
+    hurt = {
+      path   = <span class="c-str">"assets/sfx/hurt.wav"</span>,
+    },
+    menu = {
+      navigate = <span class="c-str">"coin"</span>,
+      select   = <span class="c-str">"jump"</span>,
+      back     = <span class="c-str">"hurt"</span>,
+    },
+  },
+
+  <span class="c-comment">-- filters</span>
+  filters = {
+    upscale = {
+      type = <span class="c-str">"hq2x"</span>,
+    },
+    scanline = {
+      enabled   = <span class="c-kw">true</span>,
+      intensity = <span class="c-num">0.15</span>,
+    },
+    crt = {
+      enabled   = <span class="c-kw">true</span>,
+      curvature = <span class="c-num">0.1</span>,
+      glow      = <span class="c-num">0.2</span>,
+    },
+    chromatic = {
+      enabled   = <span class="c-kw">false</span>,
+      intensity = <span class="c-num">0.5</span>,
+    },
+  },
+
+  <span class="c-comment">-- custom palette (replaces default)</span>
+  palette = {
+    <span class="c-num">0x140C1C</span>, <span class="c-num">0x442434</span>,
+    <span class="c-num">0x30346D</span>, <span class="c-num">0x4E4A4E</span>,
+    <span class="c-num">0x854C30</span>, <span class="c-num">0x346524</span>,
+    <span class="c-num">0xD04648</span>, <span class="c-num">0x757161</span>,
+    <span class="c-num">0x597DCE</span>, <span class="c-num">0xD27D2C</span>,
+    <span class="c-num">0x8595A1</span>, <span class="c-num">0x6DAA2C</span>,
+    <span class="c-num">0xD2AA99</span>, <span class="c-num">0x6DC2CA</span>,
+    <span class="c-num">0xDAD45E</span>, <span class="c-num">0xDEEED6</span>,
+  },
+
+  <span class="c-comment">-- custom fonts</span>
+  font_styles = {
+    {
+      font        = <span class="c-str">"assets/fonts/pixel.ttf"</span>,
+      size        = <span class="c-num">8</span>,
+      line_height = <span class="c-num">10</span>,
+      kerning     = <span class="c-num">0</span>,
+    },
+    {
+      font        = <span class="c-str">"assets/fonts/title.ttf"</span>,
+      size        = <span class="c-num">16</span>,
+      line_height = <span class="c-num">20</span>,
+      kerning     = <span class="c-num">1</span>,
+    },
+  },
+
+  <span class="c-comment">-- mobile</span>
+  orientation     = <span class="c-str">"landscape"</span>,
+  mobile_controls = <span class="c-kw">true</span>,
+  render_offset   = <span class="c-num">0.5</span>,
+
+  <span class="c-comment">-- itch.io publishing</span>
+  itch = {
+    user    = <span class="c-str">"doodleclan"</span>,
+    game    = <span class="c-str">"dino-quest"</span>,
+    channel = <span class="c-str">"html5"</span>,
+  },
+}</pre>
+          </div><!-- /conf-full-example -->
+        </div><!-- /conf-split -->
       </div>
 
       <!-- DRAWING -->
@@ -563,22 +815,22 @@
       <div class="section" id="palette">
         <h2>PALETTE</h2>
         <div class="palette-strip">
-          <span style="background:#140C1C" data-i="1"></span>
-          <span style="background:#442434" data-i="2"></span>
-          <span style="background:#30346D" data-i="3"></span>
-          <span style="background:#4E4A4E" data-i="4"></span>
-          <span style="background:#854C30" data-i="5"></span>
-          <span style="background:#346524" data-i="6"></span>
-          <span style="background:#D04648" data-i="7"></span>
-          <span style="background:#757161" data-i="8"></span>
-          <span style="background:#597DCE" data-i="9"></span>
-          <span style="background:#D27D2C" data-i="10"></span>
-          <span style="background:#8595A1" data-i="11"></span>
-          <span style="background:#6DAA2C" data-i="12"></span>
-          <span style="background:#D2AA99" data-i="13"></span>
-          <span style="background:#6DC2CA" data-i="14"></span>
-          <span style="background:#DAD45E" data-i="15"></span>
-          <span style="background:#DEEED6" data-i="16"></span>
+          <span style="background:#140C1C">1</span>
+          <span style="background:#442434">2</span>
+          <span style="background:#30346D">3</span>
+          <span style="background:#4E4A4E">4</span>
+          <span style="background:#854C30">5</span>
+          <span style="background:#346524">6</span>
+          <span style="background:#D04648">7</span>
+          <span style="background:#757161">8</span>
+          <span style="background:#597DCE">9</span>
+          <span style="background:#D27D2C">10</span>
+          <span style="background:#8595A1">11</span>
+          <span style="background:#6DAA2C">12</span>
+          <span style="background:#D2AA99">13</span>
+          <span style="background:#6DC2CA">14</span>
+          <span style="background:#DAD45E">15</span>
+          <span style="background:#DEEED6">16</span>
         </div>
         <div class="note">Default: Dawnbringer 16. Custom palettes can be set in conf.lua or at runtime.</div>
         <div class="fn">
@@ -606,6 +858,10 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">print</span>(<span class="fn-param">text</span>, <span class="fn-param">x</span>, <span class="fn-param">y</span>, <span class="fn-opt">[color]</span>, <span class="fn-opt">[bg_color]</span>)</div>
           <div class="fn-desc">Print text at position</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">printo</span>(<span class="fn-param">text</span>, <span class="fn-param">x</span>, <span class="fn-param">y</span>, <span class="fn-opt">[color]</span>, <span class="fn-opt">[outline_color]</span>)</div>
+          <div class="fn-desc">Print text with 1px outline. outline_color defaults to 1 (dark)</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">text_width</span>(<span class="fn-param">text</span>)</div>
@@ -649,6 +905,10 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">spr</span>(<span class="fn-param">id</span>, <span class="fn-param">sx</span>, <span class="fn-param">sy</span>, <span class="fn-param">sw</span>, <span class="fn-param">sh</span>, <span class="fn-param">dx</span>, <span class="fn-param">dy</span>, <span class="fn-opt">[dw, dh, flip_x, flip_y]</span>)</div>
           <div class="fn-desc">Draw sub-region of image (atlas-style) with optional scaling and flip</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">spro</span>(<span class="fn-param">id</span>, <span class="fn-param">sx</span>, <span class="fn-param">sy</span>, <span class="fn-param">sw</span>, <span class="fn-param">sh</span>, <span class="fn-param">dx</span>, <span class="fn-param">dy</span>, <span class="fn-param">outline_color</span>, <span class="fn-opt">[dw, dh, flip_x, flip_y]</span>)</div>
+          <div class="fn-desc">Draw sprite with 1px outline. Draws 4 offset copies in outline_color then the sprite on top</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">sprq</span>(<span class="fn-param">id</span>, <span class="fn-param">src_quad</span>, <span class="fn-param">dst_quad</span>)</div>
@@ -699,6 +959,10 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_bounds</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>)</div>
           <div class="fn-desc">Set camera movement boundaries</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_deadzone</span>(<span class="fn-param">half_w</span>, <span class="fn-opt">[half_h]</span>)</div>
+          <div class="fn-desc">Set dead zone for cam_follow. Camera won't move until target exceeds this zone. half_h defaults to half_w</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_push</span>() / <span class="fn-name">cam_pop</span>()</div>
@@ -1110,12 +1374,14 @@
       </div>
 
       <!-- LEVELS -->
-      <div class="section" id="levels">
+      <div class="section section-with-example" id="levels">
         <h2>LEVELS &amp; TILEMAPS</h2>
+        <div class="section-split">
+          <div class="section-docs">
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">create_level</span>(<span class="fn-param">level_data</span>)</div>
           <div class="fn-ret">&rarr; number</div>
-          <div class="fn-desc">Create level from data table {width, height, grid_size, tileset, tiles, camera_x?, camera_y?}</div>
+          <div class="fn-desc">Create level from data table. Returns level ID (1&ndash;16). Tile values: 0 = empty, 1+ = sprite index in tileset. <code>tileset_cols</code> enables 2D grid tileset layout.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">load_level_tiles</span>(<span class="fn-param">level_id</span>, <span class="fn-param">tiles_data</span>)</div>
@@ -1142,6 +1408,40 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">destroy_level</span>(<span class="fn-param">level_id</span>)</div>
           <div class="fn-desc">Free level memory</div>
+        </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">EXAMPLE</div>
+<pre class="conf-example"><span class="c-comment">-- create a 4x3 level</span>
+<span class="c-kw">local</span> lvl = <span class="c-fn">create_level</span>({
+  id           = <span class="c-num">1</span>,
+  width        = <span class="c-num">4</span>,
+  height       = <span class="c-num">3</span>,
+  grid_size    = <span class="c-num">16</span>,
+  tileset      = <span class="c-str">"assets/tiles.png"</span>,
+  tileset_cols = <span class="c-num">8</span>,
+  tiles = {
+    <span class="c-num">0</span>, <span class="c-num">0</span>, <span class="c-num">0</span>, <span class="c-num">0</span>,
+    <span class="c-num">0</span>, <span class="c-num">0</span>, <span class="c-num">0</span>, <span class="c-num">0</span>,
+    <span class="c-num">1</span>, <span class="c-num">2</span>, <span class="c-num">2</span>, <span class="c-num">3</span>,
+  },
+})
+
+<span class="c-comment">-- draw visible region</span>
+<span class="c-kw">function</span> <span class="c-fn">_render</span>()
+  <span class="c-fn">draw_level</span>(lvl,
+    <span class="c-num">0</span>,<span class="c-num">0</span>,  <span class="c-comment">-- cell origin</span>
+    <span class="c-num">0</span>,<span class="c-num">0</span>,  <span class="c-comment">-- screen pos</span>
+    <span class="c-num">4</span>,<span class="c-num">3</span>)  <span class="c-comment">-- cells w,h</span>
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- swap a tile at runtime</span>
+<span class="c-fn">set_tile</span>(lvl, <span class="c-num">1</span>, <span class="c-num">2</span>, <span class="c-num">5</span>)
+
+<span class="c-comment">-- read it back</span>
+<span class="c-kw">local</span> t = <span class="c-fn">get_tile</span>(lvl, <span class="c-num">1</span>, <span class="c-num">2</span>)
+<span class="c-comment">-- t == 5</span></pre>
+          </div>
         </div>
       </div>
 
