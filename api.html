@@ -562,6 +562,7 @@
           <tr><td>tags</td><td>nil</td><td>Array of tag strings for categorization.</td></tr>
           <tr><td>thumbnail</td><td>nil</td><td>Path to a thumbnail image file.</td></tr>
           <tr><td>entry</td><td>"main.d8"</td><td>Entry script file, relative to the project directory.</td></tr>
+          <tr><td>engine</td><td>nil</td><td>Target major engine version (integer). If the engine&rsquo;s major version is lower, the project won&rsquo;t run and will prompt you to update. If the engine is newer, a compatibility warning is shown. Omit to skip the check.</td></tr>
         </table>
 
         <h3 class="conf-subsection">Display</h3>
@@ -657,6 +658,7 @@
   tags        = { <span class="c-str">"platformer"</span>, <span class="c-str">"retro"</span> },
   thumbnail   = <span class="c-str">"assets/thumb.png"</span>,
   entry       = <span class="c-str">"main.d8"</span>,
+  engine      = <span class="c-num">0</span>,
 
   <span class="c-comment">-- display</span>
   width      = <span class="c-num">256</span>,

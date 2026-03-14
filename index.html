@@ -355,6 +355,64 @@
     .c-arg { color: var(--yellow); }
     .c-str { color: var(--green); }
 
+    .cli-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .cli-header h2 {
+      margin-bottom: 0;
+    }
+
+    .cli-toggle {
+      padding: 0.2rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.7rem;
+      background: transparent;
+      border: 1px solid var(--dim);
+      border-radius: 3px;
+      color: var(--dim);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    .cli-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cli-cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .cli-cmd-item pre {
+      margin-bottom: 0;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .cli-cmd-item p {
+      background: var(--bg2);
+      border: 1px solid #2a2040;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      padding: 0.5rem 1rem;
+      margin: 0 0 0.5rem;
+      color: var(--dim);
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .cli-cmd-item p code {
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
     .features {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -549,15 +607,90 @@
     </section>
 
     <section id="cli">
-      <h2>CLI</h2>
+      <div class="cli-header">
+        <h2>CLI</h2>
+        <button class="cli-toggle" onclick="toggleCliView()" id="cliToggle">expand</button>
+      </div>
+      <div id="cliCompact">
 <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game/</span>              <span class="c-comment"># run a project</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">my-game.fos</span>           <span class="c-comment"># run a package</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">create</span> my-game        <span class="c-comment"># scaffold a new game</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">fossilize</span> my-game     <span class="c-comment"># create .fos package</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">validate</span> my-game/     <span class="c-comment"># check project structure</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">export web</span> my-game/   <span class="c-comment"># single-file HTML export</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">export ios</span> my-game/   <span class="c-comment"># export Xcode project</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">push</span> my-game/         <span class="c-comment"># publish to itch.io</span>
+<span class="c-cmd">dino8</span> <span class="c-arg">examples</span>              <span class="c-comment"># download example projects</span>
 <span class="c-cmd">dino8</span> <span class="c-arg">help</span>                  <span class="c-comment"># all commands</span></pre>
+      </div>
+      <div id="cliExpanded" style="display:none;">
+        <div class="cli-cmd-list">
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game/</span></pre>
+            <p>Run a game from a project directory. Auto-detects <code>conf.lua</code> and launches your game with hot reload — edit your code and see changes instantly without restarting.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game.fos</span></pre>
+            <p>Run a packaged <code>.fos</code> file. Fossils are self-contained game archives — share them with players or use them for distribution.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">create</span> my-game</pre>
+            <p>Scaffold a new game project with the standard directory structure, a starter <code>conf.lua</code>, and a minimal <code>main.d8</code> entry point. The fastest way to start building.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">fossilize</span> my-game</pre>
+            <p>Package your project into a single <code>.fos</code> archive. Bundles all code, assets, and config into a portable file that can be run, shared, or uploaded.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">validate</span> my-game/</pre>
+            <p>Check your project structure before packaging. Verifies <code>conf.lua</code> is valid, referenced assets exist, and the entry point is reachable — catches mistakes early.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">export web</span> my-game/</pre>
+            <p>Export your game as a single self-contained HTML file. Drop it on any web server or upload to itch.io — no server-side code needed.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">export ios</span> my-game/</pre>
+            <p>Export your game as an Xcode project ready for iOS. Generates the full project structure so you can build and deploy to iPhone and iPad.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">push</span> my-game/</pre>
+            <p>Publish your game directly to itch.io using butler. Handles fossilizing, web export, and upload in one step — configure your <code>itch</code> table in <code>conf.lua</code> and go.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">info</span> my-game.fos</pre>
+            <p>Display metadata about a <code>.fos</code> file or project — title, author, version, file count, and size. Useful for inspecting packages before distributing.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">list</span> my-game.fos</pre>
+            <p>Show the file tree inside a <code>.fos</code> archive. Handy for verifying what got packaged or debugging missing assets.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">extract</span> my-game.fos</pre>
+            <p>Extract a <code>.fos</code> archive back into a directory. Useful for inspecting packaged games, modding, or recovering source from a distributed fossil.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">test</span> my-game/</pre>
+            <p>Run unit tests for your game in headless mode. Executes your test suite and reports results without opening a window.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">simulate</span> my-game/</pre>
+            <p>Run your game in headless simulation mode — no window, no audio. Great for automated testing, CI pipelines, or verifying game logic without a display.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">examples</span></pre>
+            <p>Download the official example projects. A quick way to explore what dino8 can do and learn from working code.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">update</span></pre>
+            <p>Update the dino8 engine to the latest version. Checks for a newer release and installs it in place.</p>
+          </div>
+          <div class="cli-cmd-item">
+            <pre><span class="c-cmd">dino8</span> <span class="c-arg">help</span></pre>
+            <p>Show the full list of commands and global options. Use <code>dino8 help &lt;command&gt;</code> for details on a specific command.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
 
@@ -565,7 +698,17 @@
   </div>
 
   <script>
-    const WORKER_URL = 'https://dino8-codes.pmlomb.workers.dev';
+    function toggleCliView() {
+      const compact = document.getElementById('cliCompact');
+      const expanded = document.getElementById('cliExpanded');
+      const btn = document.getElementById('cliToggle');
+      const isCompact = compact.style.display !== 'none';
+      compact.style.display = isCompact ? 'none' : '';
+      expanded.style.display = isCompact ? '' : 'none';
+      btn.textContent = isCompact ? 'compact' : 'expand';
+    }
+
+    const WORKER_URL = 'https://dino8.pmlomb.workers.dev';
 
     function toggleEarlyAccess() {
       const el = document.getElementById('earlyAccess');
