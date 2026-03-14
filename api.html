@@ -467,6 +467,9 @@
       <h3>DATA</h3>
       <a href="#tables">Table Utilities</a>
       <a href="#math">Math</a>
+      <a href="#collision">Collision</a>
+      <a href="#utilities">Utilities</a>
+      <a href="#easing">Easing</a>
       <a href="#persistence">Persistence</a>
       <a href="#file-io">File I/O</a>
       <h3>WORLD</h3>
@@ -480,12 +483,17 @@
       <a href="#notifications">Notifications</a>
       <a href="#menu">Pause Menu</a>
       <a href="#console">Console &amp; Loading</a>
+      <h3>NETWORK</h3>
+      <a href="#websocket">WebSocket</a>
+      <a href="#http">HTTP</a>
+      <a href="#json">JSON</a>
+      <a href="#preview">Preview</a>
     </nav>
 
     <main>
       <header>
         <h1>API REFERENCE</h1>
-        <p>Complete Lua API for the Dino8 game engine.</p>
+        <p>Complete Lua API for the Dino8 retro game toolkit.</p>
       </header>
 
       <!-- GLOBALS -->
@@ -557,7 +565,7 @@
           <tr><td>title</td><td>"dino8"</td><td>Game title, shown in window title bar and used for save data.</td></tr>
           <tr><td>author</td><td>"Unknown"</td><td>Creator name.</td></tr>
           <tr><td>version</td><td>"0.1.0"</td><td>Semantic version string.</td></tr>
-          <tr><td>description</td><td>"A retro game engine"</td><td>Short project description.</td></tr>
+          <tr><td>description</td><td>"A retro game toolkit"</td><td>Short project description.</td></tr>
           <tr><td>type</td><td>"game"</td><td>Project type: <code>"game"</code>, <code>"tool"</code>, or <code>"data"</code>.</td></tr>
           <tr><td>tags</td><td>nil</td><td>Array of tag strings for categorization.</td></tr>
           <tr><td>thumbnail</td><td>nil</td><td>Path to a thumbnail image file.</td></tr>
@@ -923,6 +931,15 @@
           <div class="fn-sig"><span class="fn-name">unload_image</span>(<span class="fn-param">id</span>)</div>
           <div class="fn-desc">Free image memory</div>
         </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">fget</span>(<span class="fn-param">sprite_id</span>, <span class="fn-opt">[flag]</span>)</div>
+          <div class="fn-ret">&rarr; number | boolean</div>
+          <div class="fn-desc">Get sprite flag(s). Without flag: returns all 8 flags as bitmask. With flag (0-7): returns true/false</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">fset</span>(<span class="fn-param">sprite_id</span>, <span class="fn-param">flag</span>, <span class="fn-param">val</span>)</div>
+          <div class="fn-desc">Set sprite flag bit (0-7). With 2 args: sets all flags as bitmask number</div>
+        </div>
       </div>
 
       <!-- CAMERA -->
@@ -972,6 +989,10 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_push</span>() / <span class="fn-name">cam_pop</span>()</div>
           <div class="fn-desc">Save/restore camera state to stack</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_rotate</span>(<span class="fn-param">angle</span>)</div>
+          <div class="fn-desc">Rotate camera by angle in radians</div>
         </div>
       </div>
 
@@ -1093,6 +1114,16 @@
           <div class="fn-ret">&rarr; "keyboard" | "touch" | "gamepad"</div>
           <div class="fn-desc">Current input mode (auto-switches based on last device used)</div>
         </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">key</span>(<span class="fn-param">key_name</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if physical key is held. Bypasses key binding remapping. e.g. "a", "space", "enter"</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">keyp</span>(<span class="fn-param">key_name</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if physical key was just pressed this frame. Bypasses key binding remapping.</div>
+        </div>
       </div>
 
       <!-- MOUSE -->
@@ -1116,6 +1147,20 @@
         <div class="fn">
           <div class="fn-sig">btn(<span class="fn-param">"mouse_left"</span>) / btn(<span class="fn-param">"mouse_right"</span>) / btn(<span class="fn-param">"mouse_middle"</span>)</div>
           <div class="fn-desc">Alternative: mouse buttons via btn/btnp (also "mouse1", "mouse2", "mouse3")</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">get_mouse</span>()</div>
+          <div class="fn-ret">&rarr; x, y</div>
+          <div class="fn-desc">Get current mouse position as two values (alternative to mouse_x/mouse_y)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">get_hardware_mouse_visibility</span>()</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if the hardware OS mouse cursor is currently visible</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">set_hardware_mouse_visibility</span>(<span class="fn-param">visible</span>)</div>
+          <div class="fn-desc">Show or hide the hardware OS mouse cursor (hidden while window is focused)</div>
         </div>
       </div>
 
@@ -1155,6 +1200,26 @@
           <div class="fn-ret">&rarr; number</div>
           <div class="fn-desc">Get current render offset (0-1)</div>
         </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">mobile_controls</span>(<span class="fn-opt">[enabled]</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Enable/disable virtual on-screen controls (D-pad + buttons). If no arg, returns current state.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">mobile_controls_config</span>(<span class="fn-opt">[config]</span>)</div>
+          <div class="fn-ret">&rarr; table</div>
+          <div class="fn-desc">Configure virtual controls. config: {opacity, scale, enabled}. Returns current config.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">touch_active</span>()</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if any touch points are currently active on the screen</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">touch_pos</span>()</div>
+          <div class="fn-ret">&rarr; x, y | nil, nil</div>
+          <div class="fn-desc">First active touch position in game coordinates. Returns nil, nil if no touch.</div>
+        </div>
       </div>
 
       <!-- SFX -->
@@ -1185,6 +1250,23 @@
           <div class="fn-sig"><span class="fn-name">get_sfx_count</span>(<span class="fn-param">sfx_id</span>)</div>
           <div class="fn-ret">&rarr; number</div>
           <div class="fn-desc">Number of loaded audio file variations for this sfx</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">pause_sfx</span>(<span class="fn-opt">[channel]</span>)</div>
+          <div class="fn-desc">Pause a specific channel or all channels if omitted</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">resume_sfx</span>(<span class="fn-opt">[channel]</span>)</div>
+          <div class="fn-desc">Resume a paused channel or all channels if omitted</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">is_channel_playing</span>(<span class="fn-param">channel</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if the specified mixer channel is currently playing audio</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">sfx_channel</span>(<span class="fn-param">channel</span>, <span class="fn-param">sfx_id</span>, <span class="fn-opt">[volume]</span>)</div>
+          <div class="fn-desc">Play a sound effect on a specific mixer channel for explicit channel control</div>
         </div>
       </div>
 
@@ -1305,6 +1387,87 @@
           <div class="fn-sig"><span class="fn-name">deg2rad</span>(<span class="fn-param">deg</span>) / <span class="fn-name">rad2deg</span>(<span class="fn-param">rad</span>)</div>
           <div class="fn-ret">&rarr; number</div>
           <div class="fn-desc">Angle conversion</div>
+        </div>
+      </div>
+
+      <!-- COLLISION -->
+      <div class="section" id="collision">
+        <h2>COLLISION</h2>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">collides</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">w1</span>, <span class="fn-param">h1</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-param">w2</span>, <span class="fn-param">h2</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Check if two axis-aligned rectangles overlap (AABB)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">point_in_rect</span>(<span class="fn-param">px</span>, <span class="fn-param">py</span>, <span class="fn-param">x</span>, <span class="fn-param">y</span>, <span class="fn-param">w</span>, <span class="fn-param">h</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Check if a point is inside a rectangle</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">point_in_circ</span>(<span class="fn-param">px</span>, <span class="fn-param">py</span>, <span class="fn-param">cx</span>, <span class="fn-param">cy</span>, <span class="fn-param">r</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Check if a point is inside a circle</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">rect_overlap</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">w1</span>, <span class="fn-param">h1</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-param">w2</span>, <span class="fn-param">h2</span>)</div>
+          <div class="fn-ret">&rarr; x, y, w, h | nil</div>
+          <div class="fn-desc">Get the overlap rectangle of two AABBs, or nil if no overlap</div>
+        </div>
+      </div>
+
+      <!-- UTILITIES -->
+      <div class="section" id="utilities">
+        <h2>UTILITIES</h2>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">lerp</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>, <span class="fn-param">t</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Linear interpolation: a + (b - a) * t</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">slerp</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>, <span class="fn-param">t</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Spherical interpolation for angles (radians). Takes shortest path</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">clamp</span>(<span class="fn-param">val</span>, <span class="fn-param">min</span>, <span class="fn-param">max</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Clamp value between min and max</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">sign</span>(<span class="fn-param">x</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Returns -1, 0, or 1</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">approach</span>(<span class="fn-param">current</span>, <span class="fn-param">target</span>, <span class="fn-param">step</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Move current toward target by step. Snaps if within step distance</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">distance</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">2D Euclidean distance between two points</div>
+        </div>
+      </div>
+
+      <!-- EASING -->
+      <div class="section" id="easing">
+        <h2>EASING</h2>
+        <div class="note">Easing functions accept an optional curve parameter from the <code>Ease</code> table. Default: <code>Ease.Quad</code>. Available curves: <code>Quad</code>, <code>Cubic</code>, <code>Quart</code>, <code>Quint</code>, <code>Sine</code>, <code>Expo</code>, <code>Circ</code>, <code>Back</code>, <code>Elastic</code>, <code>Bounce</code></div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">ease_in</span>(<span class="fn-param">t</span>, <span class="fn-opt">[curve]</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Ease-in (accelerating). e.g. <code>ease_in(t, Ease.Bounce)</code></div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">ease_out</span>(<span class="fn-param">t</span>, <span class="fn-opt">[curve]</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Ease-out (decelerating). e.g. <code>ease_out(t, Ease.Elastic)</code></div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">ease_in_out</span>(<span class="fn-param">t</span>, <span class="fn-opt">[curve]</span>)</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Ease-in-out (accelerate then decelerate). e.g. <code>ease_in_out(t, Ease.Back)</code></div>
         </div>
       </div>
 
@@ -1590,6 +1753,85 @@
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">sleep</span>(<span class="fn-param">ms</span>)</div>
           <div class="fn-desc">Delay execution for milliseconds</div>
+        </div>
+      </div>
+
+      <!-- WEBSOCKET -->
+      <div class="section" id="websocket">
+        <h2>WEBSOCKET</h2>
+        <div class="note">Connect to WebSocket servers for real-time multiplayer or live data. Tables sent via <code>websocket_send</code> are auto-encoded to JSON. Works on both native and web builds.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">websocket_connect</span>(<span class="fn-param">url</span>)</div>
+          <div class="fn-ret">&rarr; userdata | nil</div>
+          <div class="fn-desc">Connect to a WebSocket server. Returns a handle, or nil on failure.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">websocket_send</span>(<span class="fn-param">ws</span>, <span class="fn-param">data</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Send data through the connection. data can be a string or a table (auto-encoded to JSON).</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">websocket_receive</span>(<span class="fn-param">ws</span>)</div>
+          <div class="fn-ret">&rarr; string | nil</div>
+          <div class="fn-desc">Get next message from the queue, or nil if empty. Call each frame to drain incoming messages.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">websocket_is_connected</span>(<span class="fn-param">ws</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">Check if the connection is open.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">websocket_close</span>(<span class="fn-param">ws</span>)</div>
+          <div class="fn-desc">Close the connection and release resources.</div>
+        </div>
+      </div>
+
+      <!-- HTTP -->
+      <div class="section" id="http">
+        <h2>HTTP</h2>
+        <div class="note">Asynchronous HTTP requests. Callbacks fire on completion with (success, data). Tables sent via <code>http_post</code> are auto-encoded to JSON.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">http_get</span>(<span class="fn-param">url</span>, <span class="fn-param">callback</span>)</div>
+          <div class="fn-desc">Perform async GET request. callback(success, data) fires on completion.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">http_post</span>(<span class="fn-param">url</span>, <span class="fn-param">data</span>, <span class="fn-param">callback</span>)</div>
+          <div class="fn-desc">Perform async POST request. data can be a string or a table (auto-encoded to JSON). callback(success, data) fires on completion.</div>
+        </div>
+      </div>
+
+      <!-- JSON -->
+      <div class="section" id="json">
+        <h2>JSON</h2>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">json_decode</span>(<span class="fn-param">json_string</span>)</div>
+          <div class="fn-ret">&rarr; any</div>
+          <div class="fn-desc">Parse a JSON string into a Lua value (table, string, number, boolean, or nil). Throws error on invalid JSON.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">json_encode</span>(<span class="fn-param">value</span>)</div>
+          <div class="fn-ret">&rarr; string</div>
+          <div class="fn-desc">Encode a Lua value to compact JSON (no whitespace)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">json_encode_pretty</span>(<span class="fn-param">value</span>)</div>
+          <div class="fn-ret">&rarr; string</div>
+          <div class="fn-desc">Encode a Lua value to formatted JSON with indentation</div>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="section" id="preview">
+        <h2>PREVIEW</h2>
+        <div class="note">Open a preview window for another Dino8 project. Useful for tools and editors that need to preview a game in real time.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">preview_open</span>(<span class="fn-param">options</span>)</div>
+          <div class="fn-ret">&rarr; handle</div>
+          <div class="fn-desc">Open a preview window. options: {project, entry, title?, scale?, watch?}. Returns handle with :send(), :receive(), :is_open(), :close(), :focus().</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">preview_send</span>(<span class="fn-param">data</span>)</div>
+          <div class="fn-desc">Send a message from inside a preview script back to the editor</div>
         </div>
       </div>
 
