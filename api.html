@@ -883,6 +883,14 @@
           <div class="fn-desc">Draw filled rectangle</div>
         </div>
         <div class="fn">
+          <div class="fn-sig"><span class="fn-name">fillp</span>(<span class="fn-opt">[pattern, [color2]]</span>)</div>
+          <div class="fn-desc">Set fill pattern for rectf/circf. pattern: 16-bit number (0b0101...) or glyph string ("#"). color2: secondary color index. No args resets to solid fill. Use PATTERN constants for presets.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">PATTERN</span>.<span class="fn-param">CHECKER</span> / <span class="fn-name">PATTERN</span>.<span class="fn-param">STRIPE_H</span> / <span class="fn-name">PATTERN</span>.<span class="fn-param">STRIPE_V</span> / ...</div>
+          <div class="fn-desc">Preset fill pattern constants. Also: DOTS_SPARSE, DOTS_DENSE, DIAG_R, DIAG_L, BAR_H, LIGHT, HATCH</div>
+        </div>
+        <div class="fn">
           <div class="fn-sig"><span class="fn-name">checker</span>(<span class="fn-param">x</span>, <span class="fn-param">y</span>, <span class="fn-param">w</span>, <span class="fn-param">h</span>, <span class="fn-param">cell_size</span>, <span class="fn-param">color1</span>, <span class="fn-opt">[color2]</span>)</div>
           <div class="fn-desc">Draw checkerboard pattern</div>
         </div>
@@ -1250,16 +1258,16 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
       <!-- KEYBOARD & BUTTONS -->
       <div class="section" id="keyboard">
         <h2>KEYBOARD &amp; BUTTONS</h2>
-        <div class="note">Check button and key state. <code>btn</code>/<code>btnp</code> use remappable bindings; <code>key</code>/<code>keyp</code> read physical keys directly.</div>
+        <div class="note">Check button and key state. <code>btn</code>/<code>btnp</code> use remappable bindings; <code>key</code>/<code>keyp</code> read physical keys directly. Up to 4 players supported.</div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">btn</span>(<span class="fn-param">input</span>)</div>
+          <div class="fn-sig"><span class="fn-name">btn</span>(<span class="fn-param">input</span>, <span class="fn-opt">[player]</span>)</div>
           <div class="fn-ret">&rarr; boolean</div>
-          <div class="fn-desc">True if key/button is held. input: key name ("a", "space", "left") or player number (0-7)</div>
+          <div class="fn-desc">True if key/button is held. input: key name ("a", "space", "left") or player number (0-7). player: 0-3 (default 0)</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">btnp</span>(<span class="fn-param">input</span>)</div>
+          <div class="fn-sig"><span class="fn-name">btnp</span>(<span class="fn-param">input</span>, <span class="fn-opt">[player]</span>)</div>
           <div class="fn-ret">&rarr; boolean</div>
-          <div class="fn-desc">True if just pressed (with auto-repeat). Default: 250ms initial, 100ms repeat.</div>
+          <div class="fn-desc">True if just pressed (with auto-repeat). player: 0-3 (default 0). Default timing: 250ms initial, 100ms repeat.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">get_btnp</span>()</div>
@@ -1276,9 +1284,9 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
           <div class="fn-desc">Get current repeat rates</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">get_input_mode</span>()</div>
+          <div class="fn-sig"><span class="fn-name">get_input_mode</span>(<span class="fn-opt">[player]</span>)</div>
           <div class="fn-ret">&rarr; "keyboard" | "touch" | "gamepad"</div>
-          <div class="fn-desc">Current input mode (auto-switches based on last device used)</div>
+          <div class="fn-desc">Current input mode for player (auto-switches based on last device used). player: 0-3 (default 0)</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">key</span>(<span class="fn-param">key_name</span>)</div>
@@ -1334,16 +1342,21 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
       <!-- GAMEPAD -->
       <div class="section" id="gamepad">
         <h2>GAMEPAD</h2>
-        <div class="note">Gamepad detection. Use <code>btn</code>/<code>btnp</code> with player numbers for gamepad input.</div>
+        <div class="note">Up to 4 gamepads supported. Use <code>btn</code>/<code>btnp</code> with the player argument for per-controller input.</div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">gamepad_connected</span>()</div>
-          <div class="fn-ret">&rarr; boolean</div>
-          <div class="fn-desc">True if a gamepad is connected</div>
+          <div class="fn-sig"><span class="fn-name">gamepad_count</span>()</div>
+          <div class="fn-ret">&rarr; number</div>
+          <div class="fn-desc">Number of connected gamepads (0-4)</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">gamepad_name</span>()</div>
+          <div class="fn-sig"><span class="fn-name">gamepad_connected</span>(<span class="fn-opt">[player]</span>)</div>
+          <div class="fn-ret">&rarr; boolean</div>
+          <div class="fn-desc">True if a gamepad is connected for player (default 0)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">gamepad_name</span>(<span class="fn-opt">[player]</span>)</div>
           <div class="fn-ret">&rarr; string | nil</div>
-          <div class="fn-desc">Controller name, or nil</div>
+          <div class="fn-desc">Controller name for player, or nil (default player 0)</div>
         </div>
       </div>
 
