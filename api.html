@@ -283,8 +283,12 @@
       letter-spacing: 0.05em;
     }
 
-    .glyph-table { table-layout: fixed; }
+    .glyph-table { table-layout: fixed; width: 520px; }
     .glyph-table .dino8-glyph { width: 40px; }
+    .glyph-table td, .glyph-table th { padding: 0.4em 0.8em; white-space: nowrap; }
+    .glyph-table th:first-child, .glyph-table td:first-child { width: 60px; }
+    .glyph-table th:nth-child(2), .glyph-table td:nth-child(2) { width: 200px; }
+    .glyph-table th:nth-child(3), .glyph-table td:nth-child(3) { width: 260px; }
 
     .section h3 {
       font-size: 0.85rem;
@@ -582,7 +586,7 @@
         </div>
         <div class="global">
           <span class="global-name">GLYPH</span> <span class="global-type">table</span>
-          <div class="global-desc">.ARROW_LEFT .ARROW_UP .ARROW_RIGHT .ARROW_DOWN .HEART .STAR .CHECK .CROSS .NOTE .NOTES .SPADE .CLUB .DIAMOND .TRI_UP .TRI_RIGHT .TRI_DOWN .TRI_LEFT .SQUARE .CIRCLE .BLOCK .PAUSE &mdash; symbol glyphs</div>
+          <div class="global-desc">.ARROW_LEFT .ARROW_UP .ARROW_RIGHT .ARROW_DOWN .HEART .HEART_OUTLINE .STAR .STAR_OUTLINE .CHECK .CROSS .NOTE .NOTES .SPADE .CLUB .DIAMOND .TRI_UP .TRI_RIGHT .TRI_DOWN .TRI_LEFT .SQUARE .CIRCLE .BLOCK .PAUSE &mdash; symbol glyphs</div>
         </div>
         <div class="global">
           <span class="global-name">CONFIG</span> <span class="global-type">table</span>
@@ -1016,14 +1020,13 @@
         <table class="glyph-table">
           <tr><th>Glyph</th><th>Name</th><th>Usage</th></tr>
           <tr><td class="dino8-glyph" data-char="0x80"></td><td>Cursor</td><td><code>GLYPH.CURSOR</code></td></tr>
+          <tr><td class="dino8-glyph" data-char="0x87"></td><td>Menu</td><td><code>GLYPH.MENU</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x81"></td><td>Left</td><td><code>GLYPH.LEFT</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x82"></td><td>Right</td><td><code>GLYPH.RIGHT</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x83"></td><td>Up</td><td><code>GLYPH.UP</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x84"></td><td>Down</td><td><code>GLYPH.DOWN</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x85"></td><td>Action A</td><td><code>GLYPH.ACTION_A</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x86"></td><td>Action B</td><td><code>GLYPH.ACTION_B</code></td></tr>
-          <tr><td class="dino8-glyph" data-char="0x87"></td><td>Menu</td><td><code>GLYPH.MENU</code></td></tr>
-          <tr><td class="dino8-glyph" data-char="0x88"></td><td>Star</td><td><code>GLYPH.INPUT_STAR</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x89"></td><td>Bumper L</td><td><code>GLYPH.BUMPER_L</code></td></tr>
           <tr><td class="dino8-glyph" data-char="0x8A"></td><td>Bumper R</td><td><code>GLYPH.BUMPER_R</code></td></tr>
         </table>
@@ -1051,11 +1054,13 @@
           <tr><td class="dino8-glyph">&#x2588;</td><td>Full block</td><td><code>GLYPH.BLOCK</code></td></tr>
           <tr><td class="dino8-glyph">&#x23F8;</td><td>Pause (double bar)</td><td><code>GLYPH.PAUSE</code></td></tr>
           <tr><td class="dino8-glyph">&#x2605;</td><td>Star</td><td><code>GLYPH.STAR</code></td></tr>
+          <tr><td class="dino8-glyph">&#x2606;</td><td>Star outline</td><td><code>GLYPH.STAR_OUTLINE</code></td></tr>
           <tr><td class="dino8-glyph">&#x2713;</td><td>Check mark</td><td><code>GLYPH.CHECK</code></td></tr>
           <tr><td class="dino8-glyph">&#x2717;</td><td>Ballot X</td><td><code>GLYPH.CROSS</code></td></tr>
           <tr><td class="dino8-glyph">&#x266A;</td><td>Eighth note</td><td><code>GLYPH.NOTE</code></td></tr>
           <tr><td class="dino8-glyph">&#x266B;</td><td>Beamed eighth notes</td><td><code>GLYPH.NOTES</code></td></tr>
           <tr><td class="dino8-glyph">&#x2665;</td><td>Heart</td><td><code>GLYPH.HEART</code></td></tr>
+          <tr><td class="dino8-glyph">&#x2661;</td><td>Heart outline</td><td><code>GLYPH.HEART_OUTLINE</code></td></tr>
           <tr><td class="dino8-glyph">&#x2660;</td><td>Spade</td><td><code>GLYPH.SPADE</code></td></tr>
           <tr><td class="dino8-glyph">&#x2663;</td><td>Club</td><td><code>GLYPH.CLUB</code></td></tr>
           <tr><td class="dino8-glyph">&#x2666;</td><td>Diamond</td><td><code>GLYPH.DIAMOND</code></td></tr>
