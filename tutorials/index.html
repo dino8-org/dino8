@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino8 Tutorials</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="../tutorials.css">
+</head>
+<body>
+  <div class="tutorials-index">
+    <a href="../" class="back">&larr; Dino8</a>
+    <h1>TUTORIALS</h1>
+    <p class="subtitle">Step-by-step guides to build complete games.</p>
+
+    <div class="tutorial-card">
+      <div class="tutorial-row">
+        <div class="tutorial-text">
+          <h2>Breakout</h2>
+          <div class="tutorial-tags">
+            <span class="tag tag-beginner">beginner</span>
+          </div>
+          <p>Learn the core Dino8 workflow: project setup, drawing with primitives, handling input, managing game state, collision detection, and printing text to the screen.</p>
+          <a href="breakout.html" class="tutorial-btn">Build Breakout &rarr;</a>
+        </div>
+        <div class="carousel" id="breakoutCarousel">
+          <img src="images/breakout/breakout-01.gif" alt="Breakout step 1" class="active">
+          <img src="images/breakout/breakout-02.gif" alt="Breakout step 2">
+          <img src="images/breakout/breakout-03.gif" alt="Breakout step 3">
+          <div class="carousel-dots">
+            <span class="active" onclick="showSlide(0)"></span>
+            <span onclick="showSlide(1)"></span>
+            <span onclick="showSlide(2)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function() {
+      const imgs = document.querySelectorAll('#breakoutCarousel img');
+      const dots = document.querySelectorAll('#breakoutCarousel .carousel-dots span');
+      let current = 0;
+      let timer;
+
+      function show(i) {
+        imgs[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = i;
+        imgs[current].classList.add('active');
+        dots[current].classList.add('active');
+      }
+
+      function advance() {
+        show((current + 1) % imgs.length);
+      }
+
+      function startTimer() {
+        clearInterval(timer);
+        timer = setInterval(advance, 4000);
+      }
+
+      window.showSlide = function(i) {
+        show(i);
+        startTimer();
+      };
+
+      startTimer();
+    })();
+  </script>
+</body>
+</html>

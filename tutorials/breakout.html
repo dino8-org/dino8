@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino8 Tutorial: Breakout</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="breakout.css">
+</head>
+<body>
+  <div class="layout">
+    <nav>
+      <a href="../" class="back">&larr; Dino8</a>
+      <h3>STEPS</h3>
+      <a href="#step-1">1. Project setup</a>
+      <a href="#step-2">2. Draw the paddle</a>
+      <a href="#step-3">3. Move the paddle</a>
+      <a href="#step-4">4. Add the ball</a>
+      <a href="#step-5">5. Paddle collision</a>
+      <a href="#step-6">6. Ball reset</a>
+      <a href="#step-7">7. Draw bricks</a>
+      <a href="#step-8">8. Brick collision</a>
+      <a href="#step-9">9. Score</a>
+      <a href="#step-10">10. Polish</a>
+    </nav>
+
+    <main>
+      <h1>BUILD A BREAKOUT GAME</h1>
+      <p class="subtitle">Build a classic brick-breaking game from scratch in 10 steps.</p>
+
+      <!-- STEP 1 -->
+      <div class="step" id="step-1">
+        <div class="step-header">
+          <span class="step-number">STEP 1</span>
+          <span class="step-title">Project setup</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Create a new project and configure it for our 128&times;128 pixel game.</p>
+<div class="terminal">
+  <div class="terminal-bar"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
+  <pre><span class="t-prompt">$</span> dino8 create breakout --empty
+<span class="t-prompt">$</span> cd breakout</pre>
+</div>
+            <p style="margin-top: 1rem;">Open <code>conf.lua</code> and set the display size. The <code>scale</code> sets the window multiplier so each pixel is drawn 4&times;4 on screen.</p>
+            <p>We also define our sound effects up front in <code>sfx_clips</code>. Each clip has a <code>path</code> to a wav file and a <code>pitch</code> range &mdash; the engine picks a random pitch between the two values each time it plays, so repeated sounds don't feel robotic.</p>
+            <p>Grab the tutorial sound effects with the <code>get</code> command. Run this from inside your project folder &mdash; it downloads and extracts the wav files into <code>assets/audio/</code> automatically:</p>
+<div class="terminal">
+  <div class="terminal-bar"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
+  <pre><span class="t-prompt">$</span> dino8 get tutorial breakout</pre>
+</div>
+            <p>Open <code>main.d8</code> &mdash; this is your game entry point. Clear it out &mdash; we'll build everything from scratch.</p>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">CONF.LUA</span>
+            </div>
+<pre><span class="c-kw">return</span> {
+  title = <span class="c-str">"Breakout"</span>,
+  version = <span class="c-str">"0.1.0"</span>,
+  author = <span class="c-str">"Dino Dev"</span>,
+  engine = <span class="c-num">0</span>,
+  width = <span class="c-num">128</span>,
+  height = <span class="c-num">128</span>,
+  scale = <span class="c-num">4</span>,
+  entry = <span class="c-str">"main.d8"</span>,
+  sfx_clips = {
+    thud = {
+      path  = <span class="c-str">"assets/audio/thud.wav"</span>,
+      pitch = { <span class="c-num">0.8</span>, <span class="c-num">1.2</span> },
+    },
+    hit = {
+      path  = <span class="c-str">"assets/audio/break.wav"</span>,
+      pitch = { <span class="c-num">0.9</span>, <span class="c-num">1.3</span> },
+    },
+  },
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step-2">
+        <div class="step-header">
+          <span class="step-number">STEP 2</span>
+          <span class="step-title">Draw the paddle</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Start with the simplest visible thing: a white rounded rectangle near the bottom of the screen.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_draw()</code> <span>a <a href="../api.html#callbacks">callback</a> the engine calls every frame to render</span></div>
+              <div><code>cls(c)</code> <span>clear the screen with color <code>c</code> &mdash; a 1-based index into the <a href="../api.html#palette">palette</a></span></div>
+              <div><code>rrectf(x0,y0,x1,y1,r,c)</code> <span>filled rounded rectangle</span></div>
+            </div>
+            <p>Run it with <code>dino8 breakout/</code> and you should see a small white bar at the bottom.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-02-paddle.gif" alt="Step 2: paddle drawn" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">local</span> paddle_x = <span class="c-num">52</span>
+<span class="c-kw">local</span> paddle_y = <span class="c-num">120</span>
+<span class="c-kw">local</span> paddle_w = <span class="c-num">24</span>
+<span class="c-kw">local</span> paddle_h = <span class="c-num">3</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>(<span class="c-num">1</span>)
+  <span class="c-fn">rrectf</span>(paddle_x, paddle_y, paddle_x + paddle_w, paddle_y + paddle_h, <span class="c-num">1</span>, <span class="c-num">7</span>)
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step-3">
+        <div class="step-header">
+          <span class="step-number">STEP 3</span>
+          <span class="step-title">Move the paddle</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Add an <code>_update()</code> function that runs every frame before drawing. Check for left/right input and move the paddle.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_update()</code> <span>called every frame for logic</span></div>
+              <div><code>btn(name)</code> <span>true while a button is held</span></div>
+              <div><code>DT</code> <span>seconds since last frame (~1/60)</span></div>
+              <div><code>max(a,b)</code> / <code>min(a,b)</code> <span>clamp values</span></div>
+            </div>
+            <p>We multiply speed by <code>DT</code> so movement is framerate-independent. The <code>min</code> and <code>max</code> calls keep the paddle on screen.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-03-move.gif" alt="Step 3: paddle moves" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">local</span> paddle_speed = <span class="c-num">90</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"left"</span>) <span class="c-kw">then</span>
+    paddle_x = <span class="c-fn">max</span>(<span class="c-num">0</span>, paddle_x - paddle_speed * DT)
+  <span class="c-kw">end</span>
+  <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"right"</span>) <span class="c-kw">then</span>
+    paddle_x = <span class="c-fn">min</span>(<span class="c-num">128</span> - paddle_w, paddle_x + paddle_speed * DT)
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" id="step-4">
+        <div class="step-header">
+          <span class="step-number">STEP 4</span>
+          <span class="step-title">Add the ball</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Draw a small circle and give it a velocity (<code>dx</code>, <code>dy</code>). Each frame, update its position and bounce off the walls.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>circf(x,y,r,c)</code> <span>filled circle</span></div>
+              <div><code>sfx(clip)</code> <span>play a sound effect</span></div>
+            </div>
+            <p>We also play the <code>thud</code> sound effect we configured in <code>conf.lua</code>. The <code>sfx_clips</code> table is a global &mdash; use <code>sfx(sfx_clips.thud)</code> to play a clip.</p>
+            <p>The ball moves diagonally upward. It bounces off the left, right, and top walls but passes through the bottom &mdash; we'll handle that in step 6.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-04-ball.gif" alt="Step 4: ball bouncing off walls" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">local</span> ball_x = <span class="c-num">64</span>
+<span class="c-kw">local</span> ball_y = <span class="c-num">100</span>
+<span class="c-kw">local</span> ball_r = <span class="c-num">2</span>
+<span class="c-kw">local</span> ball_dx = <span class="c-num">50</span>
+<span class="c-kw">local</span> ball_dy = <span class="c-num">-70</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- input ...</span>
+
+  <span class="c-comment">-- move ball</span>
+  ball_x = ball_x + ball_dx * DT
+  ball_y = ball_y + ball_dy * DT
+
+  <span class="c-comment">-- wall bounces</span>
+  <span class="c-kw">if</span> ball_x - ball_r &lt; <span class="c-num">0</span> <span class="c-kw">then</span>
+    ball_x = ball_r
+    ball_dx = -ball_dx
+    <span class="c-fn">sfx</span>(sfx_clips.thud)
+  <span class="c-kw">end</span>
+  <span class="c-kw">if</span> ball_x + ball_r &gt; <span class="c-num">128</span> <span class="c-kw">then</span>
+    ball_x = <span class="c-num">128</span> - ball_r
+    ball_dx = -ball_dx
+    <span class="c-fn">sfx</span>(sfx_clips.thud)
+  <span class="c-kw">end</span>
+  <span class="c-kw">if</span> ball_y - ball_r &lt; <span class="c-num">0</span> <span class="c-kw">then</span>
+    ball_y = ball_r
+    ball_dy = -ball_dy
+    <span class="c-fn">sfx</span>(sfx_clips.thud)
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-comment">-- ...</span>
+  <span class="c-fn">circf</span>(ball_x, ball_y, ball_r, <span class="c-num">16</span>)
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step" id="step-5">
+        <div class="step-header">
+          <span class="step-number">STEP 5</span>
+          <span class="step-title">Paddle collision</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>When the ball hits the paddle, bounce it upward. We also steer the ball based on <em>where</em> it hit &mdash; hitting the left edge sends it left, the right edge sends it right.</p>
+            <p>The <code>hit</code> value ranges from 0 (left edge) to 1 (right edge). Subtracting 0.5 gives us a range of -0.5 to 0.5, which we scale into horizontal speed. This gives the player control over the ball's direction.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-05-paddle-hit.gif" alt="Step 5: ball bouncing off paddle" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- input ...</span>
+  <span class="c-comment">-- move ball ...</span>
+  <span class="c-comment">-- wall bounces ...</span>
+
+  <span class="c-comment">-- paddle collision</span>
+  <span class="c-kw">if</span> ball_dy &gt; <span class="c-num">0</span> <span class="c-kw">and</span>
+     ball_y + ball_r &gt;= paddle_y <span class="c-kw">and</span>
+     ball_y - ball_r &lt;= paddle_y + paddle_h <span class="c-kw">and</span>
+     ball_x &gt;= paddle_x <span class="c-kw">and</span>
+     ball_x &lt;= paddle_x + paddle_w <span class="c-kw">then</span>
+    ball_dy = -ball_dy
+    ball_y = paddle_y - ball_r
+    <span class="c-kw">local</span> hit = (ball_x - paddle_x) / paddle_w
+    ball_dx = (hit - <span class="c-num">0.5</span>) * <span class="c-num">140</span>
+    <span class="c-fn">sfx</span>(sfx_clips.thud)
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step" id="step-6">
+        <div class="step-header">
+          <span class="step-number">STEP 6</span>
+          <span class="step-title">Ball reset</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>When the ball falls past the bottom of the screen, reset it to the center. In the full game you'd lose a life here, but for now we just put it back.</p>
+            <!-- <div class="gif-container">
+              <img src="images/breakout/step-06-reset.gif" alt="Step 6: ball resets after falling" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div> -->
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- input ...</span>
+  <span class="c-comment">-- move ball ...</span>
+  <span class="c-comment">-- wall bounces ...</span>
+  <span class="c-comment">-- paddle collision ...</span>
+
+  <span class="c-comment">-- ball fell off bottom</span>
+  <span class="c-kw">if</span> ball_y &gt; <span class="c-num">132</span> <span class="c-kw">then</span>
+    ball_x = <span class="c-num">64</span>
+    ball_y = <span class="c-num">100</span>
+    ball_dx = <span class="c-num">50</span>
+    ball_dy = <span class="c-num">-70</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="step" id="step-7">
+        <div class="step-header">
+          <span class="step-number">STEP 7</span>
+          <span class="step-title">Draw bricks</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Create a grid of colored bricks at the top of the screen. We use <code>_init()</code> to build the brick table once at startup.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_init()</code> <span>called once at startup</span></div>
+              <div><code>add(t, v)</code> <span>append value to table</span></div>
+              <div><code>all(t)</code> <span>iterate over a table</span></div>
+            </div>
+            <p>Each brick is a table with position, size, color, and an <code>alive</code> flag. We lay out 8 columns and 5 rows, each row a different color.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-07-bricks.gif" alt="Step 7: brick grid" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">local</span> bricks = {}
+<span class="c-kw">local</span> brick_w = <span class="c-num">14</span>
+<span class="c-kw">local</span> brick_h = <span class="c-num">6</span>
+<span class="c-kw">local</span> brick_colors = {<span class="c-num">8</span>, <span class="c-num">9</span>, <span class="c-num">10</span>, <span class="c-num">11</span>, <span class="c-num">12</span>}
+
+<span class="c-kw">function</span> <span class="c-fn">_init</span>()
+  <span class="c-kw">for</span> row = <span class="c-num">0</span>, <span class="c-num">4</span> <span class="c-kw">do</span>
+    <span class="c-kw">for</span> col = <span class="c-num">0</span>, <span class="c-num">7</span> <span class="c-kw">do</span>
+      <span class="c-fn">add</span>(bricks, {
+        x = <span class="c-num">4</span> + col * <span class="c-num">15</span>,
+        y = <span class="c-num">16</span> + row * <span class="c-num">7</span>,
+        w = brick_w,
+        h = brick_h,
+        color = brick_colors[row + <span class="c-num">1</span>],
+        alive = <span class="c-kw">true</span>,
+      })
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>(<span class="c-num">1</span>)
+  <span class="c-kw">for</span> b <span class="c-kw">in</span> <span class="c-fn">all</span>(bricks) <span class="c-kw">do</span>
+    <span class="c-kw">if</span> b.alive <span class="c-kw">then</span>
+      <span class="c-fn">rectf</span>(b.x, b.y, b.x + b.w - <span class="c-num">1</span>, b.y + b.h - <span class="c-num">1</span>, b.color)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+  <span class="c-comment">-- paddle ...</span>
+  <span class="c-comment">-- ball ...</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="step" id="step-8">
+        <div class="step-header">
+          <span class="step-number">STEP 8</span>
+          <span class="step-title">Brick collision</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Check if the ball overlaps any alive brick. If it does, destroy the brick and bounce the ball.</p>
+            <p>The collision check is the same AABB approach we used for the paddle &mdash; check if the ball's bounding circle overlaps the brick's rectangle.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-08-brick-hit-1.gif" alt="Step 8: bricks being destroyed" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+			<img src="images/breakout/step-08-brick-hit-2.gif" alt="Step 8: bricks being destroyed"
+				onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- input ...</span>
+  <span class="c-comment">-- move ball ...</span>
+  <span class="c-comment">-- wall bounces ...</span>
+  <span class="c-comment">-- paddle collision ...</span>
+
+  <span class="c-comment">-- brick collisions</span>
+  <span class="c-kw">for</span> b <span class="c-kw">in</span> <span class="c-fn">all</span>(bricks) <span class="c-kw">do</span>
+    <span class="c-kw">if</span> b.alive <span class="c-kw">and</span>
+       ball_x + ball_r &gt; b.x <span class="c-kw">and</span>
+       ball_x - ball_r &lt; b.x + b.w <span class="c-kw">and</span>
+       ball_y + ball_r &gt; b.y <span class="c-kw">and</span>
+       ball_y - ball_r &lt; b.y + b.h <span class="c-kw">then</span>
+      b.alive = <span class="c-kw">false</span>
+      ball_dy = -ball_dy
+      <span class="c-fn">sfx</span>(sfx_clips.hit)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- ball reset ...</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 9 -->
+      <div class="step" id="step-9">
+        <div class="step-header">
+          <span class="step-number">STEP 9</span>
+          <span class="step-title">Score</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Add a <code>score</code> variable, increment it when a brick is destroyed, and display it using the <code>_ui()</code> callback. This works like <code>_draw()</code> but isn't affected by camera transforms &mdash; perfect for HUD elements.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_ui()</code> <span>called every frame for HUD overlay</span></div>
+              <div><code>print(text,x,y,c)</code> <span>draw text at position</span></div>
+            </div>
+            <!-- <div class="gif-container">
+              <img src="images/breakout/step-09-score.gif" alt="Step 9: score display" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div> -->
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">local</span> score = <span class="c-num">0</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- ...</span>
+
+  <span class="c-comment">-- brick collisions</span>
+  <span class="c-kw">for</span> b <span class="c-kw">in</span> <span class="c-fn">all</span>(bricks) <span class="c-kw">do</span>
+    <span class="c-kw">if</span> b.alive <span class="c-kw">and</span> <span class="c-comment">...</span> <span class="c-kw">then</span>
+      <span class="c-comment">-- ...</span>
+      score = score + <span class="c-num">10</span>
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- ...</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_ui</span>()
+  <span class="c-fn">print</span>(score, <span class="c-num">2</span>, <span class="c-num">2</span>, <span class="c-num">7</span>)
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 10 -->
+      <div class="step" id="step-10">
+        <div class="step-header">
+          <span class="step-number">STEP 10</span>
+          <span class="step-title">Polish</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Add screen shake when bricks are hit for a satisfying crunch feel.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>cam_shake(intensity, duration)</code> <span>screen shake effect</span></div>
+            </div>
+            <p>Just add one line inside the brick collision block. The screen will jolt briefly on each hit.</p>
+            <p style="margin-top: 1.5rem; color: var(--text);">That's it &mdash; you've built a complete breakout game! From here you can extend it with:</p>
+            <ul style="color: var(--dim); font-size: 0.85rem; margin-left: 1rem; margin-top: 0.5rem;">
+              <li>Lives and game over screen</li>
+              <li>Multiple levels with harder bricks</li>
+              <li>Power-ups (bigger paddle, multi-ball)</li>
+            </ul>
+            <p style="margin-top: 0.75rem;">Check out the full example with <code>dino8 examples</code> to see all of these in action.</p>
+            <div class="gif-container">
+              <img src="images/breakout/step-10-polish.gif" alt="Step 10: finished game with shake" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-header">
+              <span class="code-label">MAIN.D8</span>
+            </div>
+<pre><span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- ...</span>
+
+  <span class="c-comment">-- brick collisions</span>
+  <span class="c-kw">for</span> b <span class="c-kw">in</span> <span class="c-fn">all</span>(bricks) <span class="c-kw">do</span>
+    <span class="c-kw">if</span> b.alive <span class="c-kw">and</span> <span class="c-comment">...</span> <span class="c-kw">then</span>
+      b.alive = <span class="c-kw">false</span>
+      ball_dy = -ball_dy
+      score = score + <span class="c-num">10</span>
+      <span class="c-fn">sfx</span>(sfx_clips.hit)
+      <span class="c-fn">cam_shake</span>(<span class="c-num">1</span>, <span class="c-num">0.1</span>)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- ...</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+      <!-- ALTERNATIVES -->
+      <div class="final-section" style="margin-top: 1.5rem;">
+        <h2>ALTERNATIVES</h2>
+        <div class="alt-box">
+          <div class="alt-label">LOADING SOUNDS IN CODE</div>
+          <p>Instead of defining sounds in <code>conf.lua</code>, you can load them in code with <code>load_sfx()</code> and store the returned ID:</p>
+<pre><span class="c-kw">local</span> snd_thud
+<span class="c-kw">local</span> snd_hit
+
+<span class="c-kw">function</span> <span class="c-fn">_init</span>()
+  snd_thud = <span class="c-fn">load_sfx</span>(<span class="c-str">"assets/audio/thud.wav"</span>)
+  snd_hit  = <span class="c-fn">load_sfx</span>(<span class="c-str">"assets/audio/break.wav"</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- then play with:</span>
+<span class="c-fn">sfx</span>(snd_thud)
+<span class="c-fn">sfx</span>(snd_hit)</pre>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+/* Tutorials index layout */
+
+.tutorials-index {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.tutorials-index .back {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.tutorials-index .back:hover { color: var(--accent); }
+
+.tutorials-index h1 {
+  font-size: 1.6rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.tutorials-index .subtitle {
+  color: var(--dim);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+/* Tutorial card */
+
+.tutorial-card {
+  display: block;
+  text-decoration: none;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg2);
+  border: 1px solid #2a2040;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  transition: border-color 0.15s;
+}
+
+.tutorial-card:hover {
+  border-color: var(--accent);
+}
+
+.tutorial-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutorial-text h2 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.tutorial-text p {
+  color: var(--dim);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.tutorial-tags {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+.tag-beginner {
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+.tutorial-btn {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tutorial-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* Tutorial row layout */
+
+.tutorial-row {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Carousel */
+
+.carousel {
+  flex: 0 0 240px;
+  position: relative;
+  border: 1px solid #2a2040;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+.carousel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.carousel img.active {
+  opacity: 1;
+  position: relative;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0;
+  background: var(--bg2);
+}
+
+.carousel-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4E4A4E;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.carousel-dots span.active {
+  background: var(--accent);
+}
+
+@media (max-width: 500px) {
+  .tutorial-row {
+    flex-direction: column;
+  }
+  .carousel {
+    flex: none;
+    width: 100%;
+    max-width: 240px;
+  }
+}

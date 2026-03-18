@@ -5,501 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dino8 API Reference</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    :root {
-      --bg: #140C1C;
-      --bg2: #1a1228;
-      --text: #DEEED6;
-      --dim: #8595A1;
-      --accent: #6DC2CA;
-      --green: #6DAA2C;
-      --orange: #D27D2C;
-      --red: #D04648;
-      --blue: #597DCE;
-      --yellow: #DAD45E;
-      --brown: #854C30;
-    }
-
-    @font-face {
-      font-family: 'Dino8';
-      src: url('dino8.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .layout {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      width: 220px;
-      min-width: 220px;
-      overflow-y: auto;
-      padding: 1.25rem 1rem;
-      background: var(--bg2);
-      border-right: 1px solid #2a2040;
-    }
-
-    nav .back {
-      display: flex;
-      align-items: center;
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #2a2040;
-    }
-
-    nav .back:hover { color: var(--accent); }
-
-    nav h3 {
-      font-size: 0.7rem;
-      color: var(--orange);
-      letter-spacing: 0.08em;
-      margin: 0.75rem 0 0.3rem;
-    }
-
-    nav a {
-      display: block;
-      color: var(--dim);
-      text-decoration: none;
-      font-size: 0.75rem;
-      padding: 0.1rem 0;
-      transition: color 0.1s;
-    }
-
-    nav a:hover { color: var(--accent); }
-
-    main {
-      flex: 1;
-      min-width: 0;
-      padding: 2rem 2.5rem;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      margin-bottom: 0.25rem;
-    }
-
-    header p {
-      color: var(--dim);
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
-    }
-
-    .section { margin-bottom: 2.5rem; }
-
-    .section h2 {
-      font-size: 1rem;
-      color: var(--orange);
-      letter-spacing: 0.05em;
-      padding-bottom: 0.4rem;
-      border-bottom: 1px solid #2a2040;
-      margin-bottom: 1rem;
-    }
-
-    .note {
-      background: var(--bg2);
-      border: 1px solid #2a2040;
-      border-left: 3px solid var(--brown);
-      border-radius: 3px;
-      padding: 0.6rem 0.8rem;
-      font-size: 0.8rem;
-      color: var(--dim);
-      margin-bottom: 1rem;
-    }
-
-    .fn {
-      margin-bottom: 1rem;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #1a1228;
-    }
-
-    .fn:last-child { border-bottom: none; }
-
-    .fn-sig {
-      font-size: 0.85rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .fn-name { color: var(--accent); }
-    .fn-param { color: var(--yellow); }
-    .fn-opt { color: var(--dim); }
-    .fn-ret { color: var(--green); font-size: 0.8rem; }
-    .fn-desc {
-      color: var(--dim);
-      font-size: 0.8rem;
-      margin-top: 0.15rem;
-    }
-
-    .global {
-      margin-bottom: 0.75rem;
-    }
-
-    .global-name { color: var(--yellow); font-size: 0.85rem; }
-    .global-type { color: var(--dim); font-size: 0.8rem; }
-    .global-desc { color: var(--dim); font-size: 0.8rem; }
-
-    .palette-strip {
-      display: flex;
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 0.5rem 0;
-    }
-
-    .palette-strip span {
-      flex: 1;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      font-weight: 900;
-      color: #140C1C;
-    }
-
-    .palette-strip span:first-child {
-      color: #DEEED6;
-    }
-
-    .palette-strip span:nth-child(2),
-    .palette-strip span:nth-child(3) {
-      color: #DEEED6;
-    }
-
-    .search-box {
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #2a2040;
-    }
-
-    .search-box input {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid #2a2040;
-      border-radius: 3px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.5rem;
-      outline: none;
-    }
-
-    .search-box input::placeholder { color: #4a4060; }
-    .search-box input:focus { border-color: var(--accent); }
-
-    .search-hint {
-      font-size: 0.65rem;
-      color: #4a4060;
-      margin-top: 0.3rem;
-    }
-
-    .conf-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      margin-bottom: 1rem;
-      table-layout: fixed;
-    }
-
-    .conf-table th,
-    .conf-table td { padding: 0.4rem 0.6rem; }
-
-    .conf-table th {
-      text-align: left;
-      color: var(--accent);
-      border-bottom: 1px solid #2a2040;
-      font-weight: normal;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-    }
-
-    .conf-table td {
-      border-bottom: 1px solid #1a1228;
-      color: var(--dim);
-    }
-
-    .conf-table th:first-child,
-    .conf-table td:first-child {
-      width: 30%;
-      color: var(--yellow);
-      white-space: nowrap;
-    }
-
-    .conf-table th:nth-child(2),
-    .conf-table td:nth-child(2) {
-      width: 14%;
-      color: var(--text);
-      white-space: nowrap;
-    }
-
-    .conf-table th:nth-child(3),
-    .conf-table td:nth-child(3) {
-      width: 56%;
-    }
-
-    .dino8-glyph {
-      font-family: 'Dino8', monospace;
-      font-size: 1.4rem;
-      color: var(--accent);
-      text-align: center;
-    }
-
-    .section table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      margin-bottom: 1rem;
-    }
-
-    .section table th,
-    .section table td {
-      padding: 0.35rem 0.6rem;
-      text-align: left;
-      border-bottom: 1px solid #2a2040;
-    }
-
-    .section table th {
-      color: var(--dim);
-      font-size: 0.7rem;
-      letter-spacing: 0.05em;
-    }
-
-    .glyph-table { table-layout: fixed; width: 520px; }
-    .glyph-table .dino8-glyph { width: 40px; }
-    .glyph-table td, .glyph-table th { padding: 0.4em 0.8em; white-space: nowrap; }
-    .glyph-table th:first-child, .glyph-table td:first-child { width: 60px; }
-    .glyph-table th:nth-child(2), .glyph-table td:nth-child(2) { width: 200px; }
-    .glyph-table th:nth-child(3), .glyph-table td:nth-child(3) { width: 260px; }
-
-    .section h3 {
-      font-size: 0.85rem;
-      color: var(--accent);
-      margin: 1.25rem 0 0.5rem;
-    }
-
-    .section pre {
-      background: var(--bg2);
-      border: 1px solid #2a2040;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      overflow-x: auto;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-
-    .section pre code {
-      color: var(--text);
-    }
-
-    .section p {
-      color: var(--dim);
-      font-size: 0.8rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .conf-subsection {
-      font-size: 0.85rem;
-      color: var(--accent);
-      margin: 1.25rem 0 0.5rem;
-    }
-
-    .conf-example {
-      background: var(--bg2);
-      border: 1px solid #2a2040;
-      border-radius: 4px;
-      padding: 1rem;
-      overflow-x: auto;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-
-    .conf-example .c-kw { color: var(--red); }
-    .conf-example .c-str { color: var(--green); }
-    .conf-example .c-num { color: var(--orange); }
-    .conf-example .c-comment { color: var(--dim); }
-
-    #conf {
-      margin-right: -2.5rem;
-    }
-
-    #conf > h2 {
-      padding-right: 2.5rem;
-    }
-
-    .conf-split {
-      display: flex;
-      gap: 0;
-      align-items: flex-start;
-    }
-
-    .conf-split .conf-docs {
-      flex: 1;
-      min-width: 0;
-      padding-right: 2rem;
-    }
-
-    .conf-split .conf-full-example {
-      position: sticky;
-      top: 0;
-      flex: 0 0 30vw;
-      max-width: 30vw;
-      max-height: 100vh;
-      overflow-y: auto;
-      background: #12101c;
-      border-left: 1px solid #2a2040;
-      padding: 1.25rem 1.5rem;
-    }
-
-    .conf-full-example .example-label {
-      font-size: 0.7rem;
-      color: var(--orange);
-      letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
-    }
-
-    .conf-full-example pre {
-      font-size: 0.75rem;
-      line-height: 1.45;
-      padding: 0;
-      margin: 0;
-      background: none;
-      border: none;
-    }
-
-    @media (max-width: 1000px) {
-      #conf {
-        margin-right: 0;
-      }
-      #conf > h2 {
-        padding-right: 0;
-      }
-      .conf-split {
-        flex-direction: column;
-      }
-      .conf-split .conf-docs {
-        flex: 1;
-        padding-right: 0;
-      }
-      .conf-split .conf-full-example {
-        position: static;
-        width: 100%;
-        min-width: 0;
-        max-height: none;
-        border-left: none;
-        border-top: 1px solid #2a2040;
-        margin-top: 1rem;
-        padding: 1rem;
-        border-radius: 4px;
-      }
-    }
-
-    .section-with-example {
-      margin-right: -2.5rem;
-    }
-
-    .section-with-example > h2 {
-      padding-right: 2.5rem;
-    }
-
-    .section-split {
-      display: flex;
-      gap: 0;
-      align-items: flex-start;
-    }
-
-    .section-split .section-docs {
-      flex: 1;
-      min-width: 0;
-      padding-right: 2rem;
-    }
-
-    .section-split .section-example {
-      position: sticky;
-      top: 0;
-      flex: 0 0 30vw;
-      max-width: 30vw;
-      max-height: 100vh;
-      overflow-y: auto;
-      background: #12101c;
-      border-left: 1px solid #2a2040;
-      padding: 1.25rem 1.5rem;
-    }
-
-    .section-example .example-label {
-      font-size: 0.7rem;
-      color: var(--orange);
-      letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
-    }
-
-    .section-example pre {
-      font-size: 0.75rem;
-      line-height: 1.45;
-      padding: 0;
-      margin: 0;
-      background: none;
-      border: none;
-    }
-
-    @media (max-width: 1000px) {
-      .section-with-example {
-        margin-right: 0;
-      }
-      .section-with-example > h2 {
-        padding-right: 0;
-      }
-      .section-split {
-        flex-direction: column;
-      }
-      .section-split .section-example {
-        position: static;
-        width: 100%;
-        min-width: 0;
-        max-width: none;
-        max-height: none;
-        border-left: none;
-        border-top: 1px solid #2a2040;
-        margin-top: 1rem;
-        padding: 1rem;
-        border-radius: 4px;
-      }
-    }
-
-    .hidden { display: none !important; }
-
-    @media (max-width: 700px) {
-      .layout { flex-direction: column; }
-      nav {
-        position: static;
-        width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid #2a2040;
-      }
-      main { padding: 1.5rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="api.css">
 </head>
 <body>
   <div class="layout">
@@ -521,6 +28,7 @@
       <a href="#font">Font</a>
       <a href="#sprites">Sprites</a>
       <a href="#camera">Camera</a>
+      <a href="#transform">Transform</a>
       <a href="#clipping">Clipping</a>
       <a href="#render-targets">Render Targets</a>
       <a href="#snapshot">Snapshot</a>
@@ -548,6 +56,8 @@
       <h3>WORLD</h3>
       <a href="#levels">Levels &amp; Tilemaps</a>
       <a href="#physics">Physics</a>
+      <a href="#particles">Particles</a>
+      <a href="#tweens">Tweens</a>
       <h3>SYSTEM</h3>
       <a href="#window">Window</a>
       <a href="#time">Time</a>
@@ -892,6 +402,14 @@
           <div class="fn-desc">Draw filled rectangle</div>
         </div>
         <div class="fn">
+          <div class="fn-sig"><span class="fn-name">rrect</span>(<span class="fn-param">x0</span>, <span class="fn-param">y0</span>, <span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">r</span>, <span class="fn-opt">[color]</span>)</div>
+          <div class="fn-desc">Draw rounded rectangle outline. r = corner radius (clamped to half of smallest dimension)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">rrectf</span>(<span class="fn-param">x0</span>, <span class="fn-param">y0</span>, <span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">r</span>, <span class="fn-opt">[color]</span>)</div>
+          <div class="fn-desc">Draw filled rounded rectangle. r = corner radius (clamped to half of smallest dimension)</div>
+        </div>
+        <div class="fn">
           <div class="fn-sig"><span class="fn-name">fillp</span>(<span class="fn-opt">[pattern, [color2]]</span>)</div>
           <div class="fn-desc">Set fill pattern for rectf/circf. pattern: 16-bit number (0b0101...) or glyph string ("#"). color2: secondary color index. No args resets to solid fill. Use PATTERN constants for presets.</div>
         </div>
@@ -1096,8 +614,8 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
           <div class="fn-desc">Draw full image at position</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">spr</span>(<span class="fn-param">id</span>, <span class="fn-param">sx</span>, <span class="fn-param">sy</span>, <span class="fn-param">sw</span>, <span class="fn-param">sh</span>, <span class="fn-param">dx</span>, <span class="fn-param">dy</span>, <span class="fn-opt">[dw, dh, flip_x, flip_y]</span>)</div>
-          <div class="fn-desc">Draw sub-region of image (atlas-style) with optional scaling and flip</div>
+          <div class="fn-sig"><span class="fn-name">spr</span>(<span class="fn-param">id</span>, <span class="fn-param">sx</span>, <span class="fn-param">sy</span>, <span class="fn-param">sw</span>, <span class="fn-param">sh</span>, <span class="fn-param">dx</span>, <span class="fn-param">dy</span>, <span class="fn-opt">[dw, dh, flip_x, flip_y, angle, scale_x, scale_y]</span>)</div>
+          <div class="fn-desc">Draw sub-region of image (atlas-style) with optional scaling, flip, rotation, and per-axis scale. angle is in radians; scale_x/scale_y default to 1.0</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">spro</span>(<span class="fn-param">id</span>, <span class="fn-param">sx</span>, <span class="fn-param">sy</span>, <span class="fn-param">sw</span>, <span class="fn-param">sh</span>, <span class="fn-param">dx</span>, <span class="fn-param">dy</span>, <span class="fn-param">outline_color</span>, <span class="fn-opt">[dw, dh, flip_x, flip_y]</span>)</div>
@@ -1140,12 +658,20 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
           <div class="fn-desc">Reset camera to (0, 0)</div>
         </div>
         <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_push</span>() / <span class="fn-name">cam_pop</span>()</div>
+          <div class="fn-desc">Save/restore transform state. See <a href="#transform">Transform</a>.</div>
+        </div>
+        <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_translate</span>(<span class="fn-param">x</span>, <span class="fn-param">y</span>)</div>
-          <div class="fn-desc">Move camera relatively</div>
+          <div class="fn-desc">Move the origin by (x, y). See <a href="#transform">Transform</a>.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_rotate</span>(<span class="fn-param">angle</span>)</div>
+          <div class="fn-desc">Rotate by angle (radians). See <a href="#transform">Transform</a>.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_scale</span>(<span class="fn-param">sx</span>, <span class="fn-opt">[sy]</span>)</div>
-          <div class="fn-desc">Zoom camera. sy defaults to sx.</div>
+          <div class="fn-desc">Scale drawing. sy defaults to sx. See <a href="#transform">Transform</a>.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_follow</span>(<span class="fn-param">target_x</span>, <span class="fn-param">target_y</span>, <span class="fn-opt">[follow_time]</span>)</div>
@@ -1167,13 +693,54 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
           <div class="fn-sig"><span class="fn-name">cam_deadzone</span>(<span class="fn-param">half_w</span>, <span class="fn-opt">[half_h]</span>)</div>
           <div class="fn-desc">Set dead zone for cam_follow. Camera won't move until target exceeds this zone. half_h defaults to half_w</div>
         </div>
+      </div>
+
+      <!-- TRANSFORM -->
+      <div class="section section-with-example" id="transform">
+        <h2>TRANSFORM</h2>
+        <div class="note">Matrix-based transform stack for positioning, rotating, and scaling anything you draw. Use <code>cam_push</code>/<code>cam_pop</code> to isolate transforms.</div>
+        <div class="section-split">
+          <div class="section-docs">
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">cam_push</span>() / <span class="fn-name">cam_pop</span>()</div>
-          <div class="fn-desc">Save/restore camera state to stack</div>
+          <div class="fn-sig"><span class="fn-name">cam_push</span>()</div>
+          <div class="fn-desc">Save the current transform state onto the stack</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_pop</span>()</div>
+          <div class="fn-desc">Restore the previous transform state from the stack</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_translate</span>(<span class="fn-param">x</span>, <span class="fn-param">y</span>)</div>
+          <div class="fn-desc">Move the origin by (x, y)</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">cam_rotate</span>(<span class="fn-param">angle</span>)</div>
-          <div class="fn-desc">Rotate camera by angle in radians</div>
+          <div class="fn-desc">Rotate subsequent drawing by angle (radians)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">cam_scale</span>(<span class="fn-param">sx</span>, <span class="fn-opt">[sy]</span>)</div>
+          <div class="fn-desc">Scale subsequent drawing. sy defaults to sx</div>
+        </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">ROTATE AROUND A POINT</div>
+<pre class="conf-example"><span class="c-comment">-- rotate a house around its center</span>
+<span class="c-fn">cam_push</span>()
+<span class="c-fn">cam_translate</span>(cx, cy)   <span class="c-comment">-- move origin to pivot</span>
+<span class="c-fn">cam_rotate</span>(angle)       <span class="c-comment">-- rotate around it</span>
+<span class="c-fn">cam_translate</span>(-cx, -cy) <span class="c-comment">-- offset back</span>
+draw_house()
+<span class="c-fn">cam_pop</span>()</pre>
+            <br>
+            <div class="example-label">SCALE FROM CENTER</div>
+<pre class="conf-example"><span class="c-comment">-- scale a card from its center</span>
+<span class="c-fn">cam_push</span>()
+<span class="c-fn">cam_translate</span>(cx, cy)   <span class="c-comment">-- move origin to center</span>
+<span class="c-fn">cam_scale</span>(sx, sy)       <span class="c-comment">-- scale around it</span>
+<span class="c-fn">cam_translate</span>(-ox, -oy) <span class="c-comment">-- offset to top-left</span>
+draw_card()
+<span class="c-fn">cam_pop</span>()</pre>
+          </div>
         </div>
       </div>
 
@@ -1313,24 +880,37 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
       <!-- BEZIER CURVES -->
       <div class="section" id="bezier">
         <h2>BEZIER CURVES</h2>
-        <div class="note">Cubic bezier curves defined by start, two control points, and end.</div>
+        <div class="note">Create cubic bezier curve objects, then draw, sample, or subdivide them.</div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">bezier</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">cx1</span>, <span class="fn-param">cy1</span>, <span class="fn-param">cx2</span>, <span class="fn-param">cy2</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-opt">[color]</span>)</div>
-          <div class="fn-desc">Draw cubic bezier curve outline</div>
+          <div class="fn-sig"><span class="fn-name">bezier</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">cx1</span>, <span class="fn-param">cy1</span>, <span class="fn-param">cx2</span>, <span class="fn-param">cy2</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>)</div>
+          <div class="fn-ret">&rarr; id</div>
+          <div class="fn-desc">Create a bezier curve. Returns curve ID.</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">bezierf</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">cx1</span>, <span class="fn-param">cy1</span>, <span class="fn-param">cx2</span>, <span class="fn-param">cy2</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-opt">[color]</span>)</div>
-          <div class="fn-desc">Draw filled closed bezier shape</div>
+          <div class="fn-sig"><span class="fn-name">bezier_draw</span>(<span class="fn-param">id</span>, <span class="fn-opt">[color]</span>)</div>
+          <div class="fn-desc">Draw curve outline</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">bezier_point</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">cx1</span>, <span class="fn-param">cy1</span>, <span class="fn-param">cx2</span>, <span class="fn-param">cy2</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-param">t</span>)</div>
+          <div class="fn-sig"><span class="fn-name">bezier_drawf</span>(<span class="fn-param">id</span>, <span class="fn-opt">[color]</span>)</div>
+          <div class="fn-desc">Draw filled closed curve shape</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">bezier_point</span>(<span class="fn-param">id</span>, <span class="fn-param">t</span>)</div>
           <div class="fn-ret">&rarr; x, y</div>
           <div class="fn-desc">Get point on curve at parameter t (0..1)</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">bezier_points</span>(<span class="fn-param">x1</span>, <span class="fn-param">y1</span>, <span class="fn-param">cx1</span>, <span class="fn-param">cy1</span>, <span class="fn-param">cx2</span>, <span class="fn-param">cy2</span>, <span class="fn-param">x2</span>, <span class="fn-param">y2</span>, <span class="fn-opt">[segments]</span>)</div>
+          <div class="fn-sig"><span class="fn-name">bezier_points</span>(<span class="fn-param">id</span>, <span class="fn-opt">[segments]</span>)</div>
           <div class="fn-ret">&rarr; table</div>
-          <div class="fn-desc">Get subdivided points along curve. segments defaults to 16. Returns flat array {x1,y1, x2,y2, ...}</div>
+          <div class="fn-desc">Get subdivided points. segments defaults to 16. Returns flat array {x1,y1, x2,y2, ...}</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">bezier_set</span>(<span class="fn-param">id</span>, <span class="fn-param">{x1, y1, cx1, cy1, ...}</span>)</div>
+          <div class="fn-desc">Update control points. Pass a table with only the fields you want to change. Also accepts all 8 values as flat args.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">bezier_free</span>(<span class="fn-param">id</span>)</div>
+          <div class="fn-desc">Free a bezier curve</div>
         </div>
       </div>
 
@@ -1904,9 +1484,11 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
       </div>
 
       <!-- PHYSICS -->
-      <div class="section" id="physics">
+      <div class="section section-with-example" id="physics">
         <h2>PHYSICS</h2>
         <div class="note">Built-in 2D physics with automatic fixed-timestep simulation. Create bodies, apply forces, and detect collisions.</div>
+        <div class="section-split">
+          <div class="section-docs">
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">gravity</span>(<span class="fn-param">gx</span>, <span class="fn-param">gy</span>)</div>
           <div class="fn-desc">Set global gravity (e.g., gravity(0, 200))</div>
@@ -1982,8 +1564,222 @@ print(GLYPH.TRI_RIGHT .. " PLAY", 4, 50, 7)</code></pre>
           <div class="fn-desc">Destroy a physics body</div>
         </div>
         <div class="fn">
+          <div class="fn-sig"><span class="fn-name">physics_step</span>(<span class="fn-param">dt</span>)</div>
+          <div class="fn-desc">Manually advance the physics simulation by <code>dt</code> seconds — use when you need fixed-step control instead of automatic stepping</div>
+        </div>
+        <div class="fn">
           <div class="fn-sig"><span class="fn-name">physics_draw</span>()</div>
           <div class="fn-desc">Draw debug visualization of all physics bodies</div>
+        </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">EXAMPLE</div>
+<pre class="conf-example"><span class="c-comment">-- set up gravity</span>
+<span class="c-fn">gravity</span>(<span class="c-num">0</span>, <span class="c-num">200</span>)
+
+<span class="c-comment">-- create a ball and a floor</span>
+<span class="c-kw">local</span> ball = <span class="c-fn">body</span>(<span class="c-str">"circle"</span>, <span class="c-num">64</span>, <span class="c-num">32</span>, <span class="c-num">8</span>)
+<span class="c-kw">local</span> floor = <span class="c-fn">body</span>(<span class="c-str">"static_box"</span>, <span class="c-num">64</span>, <span class="c-num">120</span>, <span class="c-num">128</span>, <span class="c-num">8</span>)
+
+<span class="c-comment">-- launch the ball to the right</span>
+<span class="c-fn">body_push</span>(ball, <span class="c-num">500</span>, <span class="c-num">0</span>)
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>()
+  <span class="c-kw">local</span> x, y = <span class="c-fn">body_pos</span>(ball)
+  <span class="c-fn">circfill</span>(x, y, <span class="c-num">8</span>, <span class="c-num">7</span>)
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTICLES -->
+      <div class="section section-with-example" id="particles">
+        <h2>PARTICLES</h2>
+        <div class="note">GPU-free particle system. Create emitters with a config table, then draw them each frame. Supports pixel and sprite particles, animated sprite sheets, color progression, sub-emitters, and emission shapes.</div>
+        <div class="section-split">
+          <div class="section-docs">
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter</span>(<span class="fn-param">config</span>)</div>
+          <div class="fn-ret">&rarr; emitter_id</div>
+          <div class="fn-desc">Create a particle emitter from a config table.</div>
+        </div>
+        <table class="conf-table">
+          <tr><th>field</th><th>default</th><th>description</th></tr>
+          <tr><td>sprite</td><td>nil</td><td>Image ID for sprite particles. Omit for pixel particles.</td></tr>
+          <tr><td>frame</td><td>nil</td><td>Source rect <code>{sx, sy, sw, sh}</code> within sprite sheet.</td></tr>
+          <tr><td>frame_range</td><td>nil</td><td>Animation frames <code>{start, end}</code> for sprite sheet animation.</td></tr>
+          <tr><td>anim_duration</td><td>nil</td><td>Seconds for one animation cycle.</td></tr>
+          <tr><td>anim_loop</td><td>false</td><td>Loop the sprite animation.</td></tr>
+          <tr><td>max</td><td>256</td><td>Particle pool size.</td></tr>
+          <tr><td>rate</td><td>0</td><td>Particles emitted per second. 0 = burst only.</td></tr>
+          <tr><td>life</td><td>1</td><td>Particle lifetime in seconds, or <code>{min, max}</code> for random range.</td></tr>
+          <tr><td>speed</td><td>0</td><td>Emission speed in px/sec, or <code>{min, max}</code> for random range.</td></tr>
+          <tr><td>direction</td><td>0</td><td>Emission angle in radians.</td></tr>
+          <tr><td>spread</td><td>0</td><td>Emission cone width in radians (6.28 = full circle).</td></tr>
+          <tr><td>gravity</td><td>0</td><td>Downward pull: number or <code>{gx, gy}</code> for directional.</td></tr>
+          <tr><td>damping</td><td>1.0</td><td>Velocity multiplier per frame. 1.0 = no damping.</td></tr>
+          <tr><td>colors</td><td>nil</td><td>Palette indices for color progression over lifetime.</td></tr>
+          <tr><td>size</td><td>1</td><td>Particle scale, or <code>{start, end}</code> to animate over lifetime.</td></tr>
+          <tr><td>spin</td><td>0</td><td>Rotation speed in rad/sec, or <code>{min, max}</code> for random range.</td></tr>
+          <tr><td>area</td><td>nil</td><td>Emission shape: <code>{"circ", r}</code> or <code>{"rect", w, h}</code>.</td></tr>
+        </table>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emit</span>(<span class="fn-param">emitter_id</span>, <span class="fn-param">count</span>)</div>
+          <div class="fn-ret">&rarr; emitter_id</div>
+          <div class="fn-desc">Burst-emit particles. Returns emitter_id for chaining.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_draw</span>(<span class="fn-param">emitter_id</span>, <span class="fn-param">x</span>, <span class="fn-param">y</span>)</div>
+          <div class="fn-desc">Update emitter position and draw all active particles. Call this every frame in _draw.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_pos</span>(<span class="fn-param">emitter_id</span>, <span class="fn-param">x</span>, <span class="fn-param">y</span>)</div>
+          <div class="fn-desc">Set emitter position without drawing</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_set</span>(<span class="fn-param">emitter_id</span>, <span class="fn-param">config</span>)</div>
+          <div class="fn-desc">Update emitter properties at runtime (partial config table)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_pause</span>(<span class="fn-param">emitter_id</span>) / <span class="fn-name">emitter_resume</span>(<span class="fn-param">emitter_id</span>)</div>
+          <div class="fn-desc">Pause/resume emission. Existing particles continue their life while paused.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_stop</span>(<span class="fn-param">emitter_id</span>)</div>
+          <div class="fn-desc">Stop emission (alias for emitter_pause)</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_destroy</span>(<span class="fn-param">emitter_id</span>)</div>
+          <div class="fn-desc">Destroy emitter and free all its particles</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">emitter_sub</span>(<span class="fn-param">parent_id</span>, <span class="fn-param">child_id</span>, <span class="fn-param">mode</span>)</div>
+          <div class="fn-desc">Link a sub-emitter. mode: "life" (emit from each parent particle while alive) or "death" (burst on parent particle death)</div>
+        </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">EXAMPLE</div>
+<pre class="conf-example"><span class="c-comment">-- fire sparks emitter</span>
+<span class="c-kw">local</span> sparks = <span class="c-fn">emitter</span>({
+  rate   = <span class="c-num">30</span>,
+  life   = {<span class="c-num">0.3</span>, <span class="c-num">0.8</span>},
+  speed  = {<span class="c-num">20</span>, <span class="c-num">60</span>},
+  spread = <span class="c-num">6.28</span>,
+  colors = {<span class="c-num">10</span>, <span class="c-num">9</span>, <span class="c-num">8</span>},
+  size   = {<span class="c-num">2</span>, <span class="c-num">0</span>},
+  gravity = <span class="c-num">40</span>,
+})
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>()
+  <span class="c-fn">emitter_draw</span>(sparks, <span class="c-num">64</span>, <span class="c-num">64</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- one-shot burst on click</span>
+<span class="c-kw">local</span> poof = <span class="c-fn">emitter</span>({
+  rate = <span class="c-num">0</span>,
+  life = <span class="c-num">0.4</span>,
+  speed = {<span class="c-num">30</span>, <span class="c-num">80</span>},
+  spread = <span class="c-num">6.28</span>,
+  colors = {<span class="c-num">7</span>, <span class="c-num">6</span>},
+})
+
+<span class="c-fn">emit</span>(poof, <span class="c-num">20</span>)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TWEENS -->
+      <div class="section section-with-example" id="tweens">
+        <h2>TWEENS</h2>
+        <div class="note">Animate table properties over time with easing. Compose tweens into sequences (chain) or parallel groups (group). Also provides a simple timer for delayed/interval callbacks. All easing uses ease-in-out. Pass Ease constants (Ease.Quad, Ease.Bounce, etc.) as the ease parameter.</div>
+        <div class="section-split">
+          <div class="section-docs">
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">tween</span>(<span class="fn-param">target</span>, <span class="fn-param">duration</span>, <span class="fn-param">props</span>, <span class="fn-opt">[ease]</span>, <span class="fn-opt">[opts]</span>)</div>
+          <div class="fn-ret">&rarr; handle</div>
+          <div class="fn-desc">Animate properties on target table from current values to props values over duration seconds. ease: Ease constant (default Ease.Quad). opts: table with on_start, on_complete, on_pause, on_resume, on_interval, interval, delay — or a bare function for on_complete.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">timer</span>(<span class="fn-param">duration</span>, <span class="fn-opt">[interval]</span>, <span class="fn-opt">[opts]</span>)</div>
+          <div class="fn-ret">&rarr; handle</div>
+          <div class="fn-desc">Callback-only timer (no property animation). interval: seconds between on_interval calls. opts: same as tween, or bare function for on_complete.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">chain</span>(<span class="fn-param">...</span>, <span class="fn-opt">[opts]</span>)</div>
+          <div class="fn-ret">&rarr; handle</div>
+          <div class="fn-desc">Run tween/chain/group handles in sequence (each starts when the previous finishes). Optional trailing opts table or function.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">group</span>(<span class="fn-param">...</span>, <span class="fn-opt">[opts]</span>)</div>
+          <div class="fn-ret">&rarr; handle</div>
+          <div class="fn-desc">Run tween/chain/group handles in parallel (all start together, completes when last finishes). Optional trailing opts table or function.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">tween_pause</span>(<span class="fn-param">handle</span>) / <span class="fn-name">tween_resume</span>(<span class="fn-param">handle</span>)</div>
+          <div class="fn-desc">Pause or resume a tween, chain, or group (and all nested children). Accepts handle or integer ID.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">tween_cancel</span>(<span class="fn-param">handle</span>)</div>
+          <div class="fn-desc">Cancel a tween, chain, or group without firing on_complete</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig">Ease constants: <span class="fn-name">Ease.Quad</span> (default), <span class="fn-name">Ease.Cubic</span>, <span class="fn-name">Ease.Quart</span>, <span class="fn-name">Ease.Quint</span>, <span class="fn-name">Ease.Sine</span>, <span class="fn-name">Ease.Expo</span>, <span class="fn-name">Ease.Circ</span>, <span class="fn-name">Ease.Back</span>, <span class="fn-name">Ease.Elastic</span>, <span class="fn-name">Ease.Bounce</span></div>
+          <div class="fn-desc">All curves use ease-in-out (accelerate then decelerate)</div>
+        </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">TWEEN</div>
+<pre class="conf-example"><span class="c-kw">local</span> ball = { x=<span class="c-num">0</span>, y=<span class="c-num">64</span> }
+
+<span class="c-comment">-- slide ball to x=120 over 1s</span>
+<span class="c-fn">tween</span>(ball, <span class="c-num">1</span>, { x=<span class="c-num">120</span> })
+
+<span class="c-comment">-- bounce ease with callback</span>
+<span class="c-fn">tween</span>(ball, <span class="c-num">0.5</span>, { y=<span class="c-num">32</span> },
+  Ease.Bounce, <span class="c-kw">function</span>()
+    <span class="c-fn">print</span>(<span class="c-str">"landed!"</span>)
+  <span class="c-kw">end</span>)</pre>
+            <div class="example-label" style="margin-top:1.2rem">TIMER</div>
+<pre class="conf-example"><span class="c-comment">-- do something after 2 seconds</span>
+<span class="c-fn">timer</span>(<span class="c-num">2</span>, <span class="c-kw">function</span>()
+  <span class="c-fn">print</span>(<span class="c-str">"done!"</span>)
+<span class="c-kw">end</span>)
+
+<span class="c-comment">-- tick every 0.5s for 3s</span>
+<span class="c-fn">timer</span>(<span class="c-num">3</span>, <span class="c-num">0.5</span>, {
+  on_interval = <span class="c-kw">function</span>(t)
+    <span class="c-fn">print</span>(<span class="c-str">"tick"</span>, t)
+  <span class="c-kw">end</span>,
+  on_complete = <span class="c-kw">function</span>()
+    <span class="c-fn">print</span>(<span class="c-str">"finished"</span>)
+  <span class="c-kw">end</span>,
+})</pre>
+            <div class="example-label" style="margin-top:1.2rem">CHAIN</div>
+<pre class="conf-example"><span class="c-kw">local</span> p = { x=<span class="c-num">0</span>, y=<span class="c-num">0</span> }
+
+<span class="c-comment">-- move right, then down</span>
+<span class="c-fn">chain</span>(
+  <span class="c-fn">tween</span>(p, <span class="c-num">0.5</span>, { x=<span class="c-num">100</span> }),
+  <span class="c-fn">tween</span>(p, <span class="c-num">0.5</span>, { y=<span class="c-num">80</span> }),
+  <span class="c-kw">function</span>()
+    <span class="c-fn">print</span>(<span class="c-str">"path done"</span>)
+  <span class="c-kw">end</span>
+)</pre>
+            <div class="example-label" style="margin-top:1.2rem">GROUP</div>
+<pre class="conf-example"><span class="c-kw">local</span> a = { x=<span class="c-num">0</span> }
+<span class="c-kw">local</span> b = { x=<span class="c-num">0</span> }
+
+<span class="c-comment">-- animate both at once</span>
+<span class="c-fn">group</span>(
+  <span class="c-fn">tween</span>(a, <span class="c-num">1</span>, { x=<span class="c-num">100</span> }),
+  <span class="c-fn">tween</span>(b, <span class="c-num">0.5</span>, { x=<span class="c-num">50</span> }),
+  <span class="c-kw">function</span>()
+    <span class="c-fn">print</span>(<span class="c-str">"both done"</span>)
+  <span class="c-kw">end</span>
+)</pre>
+          </div>
         </div>
       </div>
 

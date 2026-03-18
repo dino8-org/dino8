@@ -1,0 +1,22 @@
+:root {
+  --bg: #140C1C;
+  --bg2: #1a1228;
+  --text: #DEEED6;
+  --dim: #8595A1;
+  --accent: #6DC2CA;
+  --green: #6DAA2C;
+  --orange: #D27D2C;
+  --red: #D04648;
+  --blue: #597DCE;
+  --yellow: #DAD45E;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 15px;
+  line-height: 1.6;
+}
