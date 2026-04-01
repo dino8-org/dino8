@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino8 Tutorial: Pinball</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../../shared.css">
+  <link rel="stylesheet" href="../tutorial.css">
+</head>
+<body>
+  <div class="layout">
+    <nav>
+      <a href="../../" class="back">&larr; Dino8</a>
+      <h3>STEPS</h3>
+      <a href="#step-1">1. Grid &amp; debug view</a>
+      <a href="#step-2">2. Measuring tool</a>
+      <a href="#step-3">3. Wall lines</a>
+      <a href="#step-4">4. Wall collision shapes</a>
+      <a href="#step-5">5. Entity placement</a>
+      <a href="#step-6">6. Launcher</a>
+      <a href="#step-7">7. Ball reset</a>
+      <a href="#step-8">8. Bumpers &amp; collisions</a>
+      <a href="#step-9">9. Flippers</a>
+      <a href="#step-10">10. UI</a>
+      <a href="#step-11">11. Camera follow</a>
+    </nav>
+
+    <main>
+      <h1>BUILD A PINBALL MACHINE</h1>
+      <p class="subtitle">Plan a layout with debug tools, build it from data, then bring it to life with physics &mdash; flippers, bumpers, a spring launcher, and smooth camera follow.</p>
+
+      <!-- STEP 1 -->
+      <div class="step" id="step-1">
+        <div class="step-header">
+          <span class="step-number">STEP 1</span>
+          <span class="step-title">Grid &amp; debug view</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Create a new project. We'll use a <strong>160&times;260</strong> screen so you can see the full 128&times;256 playfield without scrolling &mdash; this makes it easy to plan where everything goes. We'll shrink to 128&times;128 at the end when we add camera follow.</p>
+<div class="terminal">
+  <div class="terminal-bar"><span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span></div>
+  <pre><span class="t-prompt">$</span> dino8 create pinball --empty
+<span class="t-prompt">$</span> cd pinball</pre>
+</div>
+            <p style="margin-top: 1rem;">Draw an 8-pixel grid over the playfield and show the mouse position snapped to the nearest 4 pixels. Press <strong>B</strong> to toggle the debug overlay on and off.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>cls(color)</code> <span>clear the screen</span></div>
+              <div><code>rect(x1, y1, x2, y2, color)</code> <span>draw a rectangle outline</span></div>
+              <div><code>pset(x, y, color)</code> <span>draw a single pixel</span></div>
+              <div><code>print(text, x, y, color)</code> <span>draw text</span></div>
+              <div><code>mouse_screen_pos()</code> <span>returns mouse x, y in screen coordinates</span></div>
+              <div><code>btnp(name)</code> <span>true on the frame a button is first pressed</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-01-debug.gif" alt="Step 1: grid overlay" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">conf.d8</div>
+<pre><span class="c-kw">return</span> {
+  title = <span class="c-str">"Pinball"</span>,
+  version = <span class="c-str">"0.1.0"</span>,
+  author = <span class="c-str">"Dino Dev"</span>,
+  engine = <span class="c-num">0</span>,
+  width = <span class="c-num">152</span>,
+  height = <span class="c-num">260</span>,
+  scale = <span class="c-num">3</span>,
+  entry = <span class="c-str">"main.d8"</span>,
+}</pre>
+            </div>
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> W, H = <span class="c-num">128</span>, <span class="c-num">256</span>
+<span class="c-kw">local</span> SW, SH = <span class="c-num">152</span>, <span class="c-num">260</span>
+<span class="c-kw">local</span> GRID = <span class="c-num">8</span>
+<span class="c-kw">local</span> SNAP = <span class="c-num">4</span>
+<span class="c-kw">local</span> debug_on = <span class="c-kw">true</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-kw">if</span> <span class="c-fn">btnp</span>(<span class="c-str">"action_b"</span>) <span class="c-kw">then</span>
+    debug_on = <span class="c-kw">not</span> debug_on
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">draw_grid</span>()
+  <span class="c-kw">for</span> gx = <span class="c-num">0</span>, SW / GRID - <span class="c-num">1</span> <span class="c-kw">do</span>
+    <span class="c-kw">for</span> gy = <span class="c-num">0</span>, SH / GRID - <span class="c-num">1</span> <span class="c-kw">do</span>
+      <span class="c-fn">rect</span>(gx * GRID, gy * GRID,
+           gx * GRID + GRID,
+           gy * GRID + GRID, <span class="c-num">2</span>)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+  <span class="c-comment">-- screen boundary at x=128</span>
+  <span class="c-fn">line</span>(W, <span class="c-num">0</span>, W, SH, <span class="c-num">3</span>)
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">draw_cursor</span>()
+  <span class="c-kw">local</span> mx, my = <span class="c-fn">mouse_screen_pos</span>()
+  <span class="c-kw">local</span> sx = <span class="c-fn">flr</span>(mx / SNAP + <span class="c-num">0.5</span>) * SNAP
+  <span class="c-kw">local</span> sy = <span class="c-fn">flr</span>(my / SNAP + <span class="c-num">0.5</span>) * SNAP
+  <span class="c-fn">pset</span>(sx, sy, <span class="c-num">7</span>)
+  <span class="c-fn">print</span>(sx .. <span class="c-str">","</span> .. sy, <span class="c-num">2</span>, <span class="c-num">252</span>, <span class="c-num">7</span>)
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>(<span class="c-num">1</span>)
+  <span class="c-kw">if</span> debug_on <span class="c-kw">then</span>
+    <span class="c-fn">draw_grid</span>()
+    <span class="c-fn">draw_cursor</span>()
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step-2">
+        <div class="step-header">
+          <span class="step-number">STEP 2</span>
+          <span class="step-title">Measuring tool</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Before we place any walls or bumpers, we need a way to <strong>measure distances</strong> on the playfield. We'll build a drag-to-measure tool with three modes:</p>
+            <ul style="margin-left: 1rem; font-size: 0.85rem; color: var(--dim);">
+              <li><strong>Line</strong> &mdash; click and drag to draw a line. Shows start and end coordinates.</li>
+              <li><strong>Rect</strong> &mdash; click and drag from the top-left corner. Shows x, y, width, and height.</li>
+              <li><strong>Circ</strong> &mdash; click the center and drag outward. Shows center coordinates and radius.</li>
+            </ul>
+            <p style="margin-top: 0.75rem;">Press <strong>A</strong> to cycle between modes. Measurements <strong>persist</strong> on screen so you can place several at once. Right-click to clear them all.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>mouse_btn(n)</code> <span>true while mouse button <code>n</code> is held (1 = left, 2 = right)</span></div>
+              <div><code>line(x1, y1, x2, y2, color)</code> <span>draw a line</span></div>
+              <div><code>circ(x, y, r, color)</code> <span>draw a circle outline</span></div>
+              <div><code>sqrt(n)</code> <span>square root</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-02-tools.gif" alt="Step 2: measuring tool" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-comment">-- measuring tool</span>
+<span class="c-kw">local</span> modes = { <span class="c-str">"line"</span>, <span class="c-str">"rect"</span>, <span class="c-str">"circ"</span> }
+<span class="c-kw">local</span> mode_idx = <span class="c-num">1</span>
+<span class="c-kw">local</span> measures = {}
+<span class="c-kw">local</span> dragging = <span class="c-kw">false</span>
+<span class="c-kw">local</span> drag_x, drag_y = <span class="c-num">0</span>, <span class="c-num">0</span>
+
+<span class="c-kw">function</span> <span class="c-fn">snap</span>(v)
+  <span class="c-kw">return</span> <span class="c-fn">flr</span>(v / SNAP + <span class="c-num">0.5</span>) * SNAP
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">update_measure</span>()
+  <span class="c-kw">if not</span> debug_on <span class="c-kw">then return end</span>
+
+  <span class="c-kw">if</span> <span class="c-fn">btnp</span>(<span class="c-str">"action_a"</span>) <span class="c-kw">then</span>
+    mode_idx = mode_idx % #modes + <span class="c-num">1</span>
+  <span class="c-kw">end</span>
+
+  <span class="c-kw">local</span> mx, my = <span class="c-fn">mouse_screen_pos</span>()
+  <span class="c-kw">local</span> sx, sy = <span class="c-fn">snap</span>(mx), <span class="c-fn">snap</span>(my)
+
+  <span class="c-kw">if</span> <span class="c-fn">mouse_btn</span>(<span class="c-num">2</span>) <span class="c-kw">then</span>
+    measures = {}
+    <span class="c-kw">return</span>
+  <span class="c-kw">end</span>
+
+  <span class="c-kw">if</span> <span class="c-fn">mouse_btn</span>(<span class="c-num">1</span>) <span class="c-kw">then</span>
+    <span class="c-kw">if not</span> dragging <span class="c-kw">then</span>
+      dragging = <span class="c-kw">true</span>
+      drag_x, drag_y = sx, sy
+    <span class="c-kw">end</span>
+  <span class="c-kw">elseif</span> dragging <span class="c-kw">then</span>
+    dragging = <span class="c-kw">false</span>
+    <span class="c-fn">add</span>(measures, {
+      mode = modes[mode_idx],
+      x1 = drag_x, y1 = drag_y,
+      x2 = sx, y2 = sy,
+    })
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">draw_measure</span>(m)
+  <span class="c-kw">if</span> m.mode == <span class="c-str">"line"</span> <span class="c-kw">then</span>
+    <span class="c-fn">line</span>(m.x1, m.y1, m.x2, m.y2, <span class="c-num">11</span>)
+    <span class="c-fn">print</span>(m.x1 .. <span class="c-str">","</span> .. m.y1,
+          m.x1 + <span class="c-num">2</span>, m.y1 - <span class="c-num">6</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+    <span class="c-fn">print</span>(m.x2 .. <span class="c-str">","</span> .. m.y2,
+          m.x2 + <span class="c-num">2</span>, m.y2 - <span class="c-num">6</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+  <span class="c-kw">elseif</span> m.mode == <span class="c-str">"rect"</span> <span class="c-kw">then</span>
+    <span class="c-kw">local</span> w = m.x2 - m.x1
+    <span class="c-kw">local</span> h = m.y2 - m.y1
+    <span class="c-fn">rect</span>(m.x1, m.y1, m.x2, m.y2, <span class="c-num">11</span>)
+    <span class="c-fn">print</span>(m.x1 .. <span class="c-str">","</span> .. m.y1,
+          m.x1 + <span class="c-num">2</span>, m.y1 - <span class="c-num">10</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+    <span class="c-fn">print</span>(<span class="c-str">"w:"</span> .. w .. <span class="c-str">" h:"</span> .. h,
+          m.x1 + <span class="c-num">2</span>, m.y2 + <span class="c-num">2</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+  <span class="c-kw">elseif</span> m.mode == <span class="c-str">"circ"</span> <span class="c-kw">then</span>
+    <span class="c-kw">local</span> dx = m.x2 - m.x1
+    <span class="c-kw">local</span> dy = m.y2 - m.y1
+    <span class="c-kw">local</span> r = <span class="c-fn">flr</span>(<span class="c-fn">sqrt</span>(dx*dx + dy*dy))
+    <span class="c-fn">circ</span>(m.x1, m.y1, r, <span class="c-num">11</span>)
+    <span class="c-fn">print</span>(m.x1 .. <span class="c-str">","</span> .. m.y1,
+          m.x1 + <span class="c-num">2</span>, m.y1 - <span class="c-num">6</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+    <span class="c-fn">print</span>(<span class="c-str">"r:"</span> .. r,
+          m.x1 + r + <span class="c-num">2</span>, m.y1, <span class="c-num">11</span>, <span class="c-num">1</span>)
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">draw_measures</span>()
+  <span class="c-kw">if not</span> debug_on <span class="c-kw">then return end</span>
+
+  <span class="c-kw">for</span> _, m <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(measures) <span class="c-kw">do</span>
+    <span class="c-fn">draw_measure</span>(m)
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- live preview while dragging</span>
+  <span class="c-kw">if</span> dragging <span class="c-kw">then</span>
+    <span class="c-kw">local</span> mx, my = <span class="c-fn">mouse_screen_pos</span>()
+    <span class="c-fn">draw_measure</span>({
+      mode = modes[mode_idx],
+      x1 = drag_x, y1 = drag_y,
+      x2 = <span class="c-fn">snap</span>(mx), y2 = <span class="c-fn">snap</span>(my),
+    })
+  <span class="c-kw">end</span>
+
+  <span class="c-fn">print</span>(<span class="c-str">"mode: "</span> .. modes[mode_idx],
+        <span class="c-num">2</span>, <span class="c-num">2</span>, <span class="c-num">11</span>, <span class="c-num">1</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- add to _update:</span>
+<span class="c-comment">-- update_measure()</span>
+
+<span class="c-comment">-- add to _draw (after draw_grid):</span>
+<span class="c-comment">-- draw_measures()</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step-3">
+        <div class="step-header">
+          <span class="step-number">STEP 3</span>
+          <span class="step-title">Wall lines</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Now we'll create a <strong>separate data file</strong> for the layout. This keeps all coordinates in one place and separates data from game logic. Use the measuring tool to find positions and lengths, then write them into <code>layout.lua</code>.</p>
+            <p>We load it with <code>read_file()</code> and <code>load()</code> &mdash; the file returns a Lua table, so we get structured data back. For now it only has wall lines.</p>
+            <p>Draw the lines in <code>_draw()</code> by looping through the data. No physics yet &mdash; these are just visual guides.</p>
+            <div class="alt-box">
+              <div class="alt-label">TIP</div>
+              <p>Because the layout is a plain data file, you could build a tool that <em>generates</em> it automatically &mdash; for example, a visual level editor that writes out the coordinates.</p>
+            </div>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>read_file(path)</code> <span>read a file as a string</span></div>
+              <div><code>load(str)()</code> <span>compile and run a Lua string &mdash; returns whatever the string returns</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-03-wall-lines.gif" alt="Step 3: wall lines" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">layout.lua</div>
+<pre><span class="c-kw">return</span> {
+  lines = {
+    <span class="c-comment">-- outside wall (left + top + launcher pipe)</span>
+    { <span class="c-num">4</span>,   <span class="c-num">256</span>, <span class="c-num">20</span>,  <span class="c-num">232</span> },
+    { <span class="c-num">20</span>,  <span class="c-num">232</span>, <span class="c-num">4</span>,   <span class="c-num">220</span> },
+    { <span class="c-num">4</span>,   <span class="c-num">220</span>, <span class="c-num">4</span>,   <span class="c-num">20</span> },
+    { <span class="c-num">4</span>,   <span class="c-num">20</span>,  <span class="c-num">20</span>,  <span class="c-num">4</span> },
+    { <span class="c-num">20</span>,  <span class="c-num">4</span>,   <span class="c-num">56</span>,  <span class="c-num">4</span> },
+    { <span class="c-num">56</span>,  <span class="c-num">4</span>,   <span class="c-num">64</span>,  <span class="c-num">8</span> },
+    { <span class="c-num">64</span>,  <span class="c-num">8</span>,   <span class="c-num">72</span>,  <span class="c-num">4</span> },
+    { <span class="c-num">72</span>,  <span class="c-num">4</span>,   <span class="c-num">128</span>, <span class="c-num">4</span> },
+    { <span class="c-num">128</span>, <span class="c-num">4</span>,   <span class="c-num">148</span>, <span class="c-num">24</span> },
+    { <span class="c-num">148</span>, <span class="c-num">24</span>,  <span class="c-num">148</span>, <span class="c-num">272</span> },
+    <span class="c-comment">-- inside wall (right side of playfield)</span>
+    { <span class="c-num">124</span>, <span class="c-num">268</span>, <span class="c-num">108</span>, <span class="c-num">232</span> },
+    { <span class="c-num">108</span>, <span class="c-num">232</span>, <span class="c-num">124</span>, <span class="c-num">220</span> },
+    { <span class="c-num">124</span>, <span class="c-num">220</span>, <span class="c-num">124</span>, <span class="c-num">20</span> },
+  },
+}</pre>
+            </div>
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-comment">-- load layout data</span>
+<span class="c-kw">local</span> layout = <span class="c-fn">load</span>(<span class="c-fn">read_file</span>(<span class="c-str">"layout.lua"</span>))()
+
+<span class="c-kw">function</span> <span class="c-fn">draw_walls</span>()
+  <span class="c-kw">for</span> _, ln <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.lines) <span class="c-kw">do</span>
+    <span class="c-fn">line</span>(ln[<span class="c-num">1</span>], ln[<span class="c-num">2</span>],
+         ln[<span class="c-num">3</span>], ln[<span class="c-num">4</span>], <span class="c-num">5</span>)
+  <span class="c-kw">end</span>
+  <span class="c-comment">-- death zone</span>
+  <span class="c-fn">line</span>(<span class="c-num">4</span>, H - <span class="c-num">1</span>, <span class="c-num">110</span>, H - <span class="c-num">1</span>, <span class="c-num">2</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- in _draw, before debug:</span>
+<span class="c-comment">-- draw_walls()</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" id="step-4">
+        <div class="step-header">
+          <span class="step-number">STEP 4</span>
+          <span class="step-title">Wall collision shapes</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Now we turn the visual lines into physics. For each line in the layout data, create an <strong>edge body</strong> &mdash; a line segment that things can bounce off.</p>
+            <p>Call <code>physics_draw()</code> at the end of <code>_draw()</code> to overlay the physics shapes in a different colour. If the outlines match your wall lines, the data is correct.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>body(x, y, config)</code> <span>create a physics body &mdash; config sets <code>shape</code>, <code>kind</code>, <code>bounce</code>, <code>friction</code>, etc.</span></div>
+              <div><code>physics_draw(color)</code> <span>draw all physics bodies as wireframes &mdash; great for debugging</span></div>
+            </div>
+            <p>Edge bodies use <code>shape = "edge"</code>. The start point is <code>(x, y)</code> and the end point is <code>(x2, y2)</code>. Setting <code>kind = "static"</code> means they never move.</p>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> walls = {}
+
+<span class="c-kw">function</span> <span class="c-fn">create_walls</span>()
+  <span class="c-kw">for</span> _, ln <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.lines) <span class="c-kw">do</span>
+    <span class="c-fn">add</span>(walls, <span class="c-fn">body</span>(ln[<span class="c-num">1</span>], ln[<span class="c-num">2</span>], {
+      shape = <span class="c-str">"edge"</span>,
+      kind = <span class="c-str">"static"</span>,
+      x2 = ln[<span class="c-num">3</span>], y2 = ln[<span class="c-num">4</span>],
+      friction = <span class="c-num">0.3</span>,
+      bounce = <span class="c-num">0.4</span>,
+    }))
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_init</span>()
+  <span class="c-fn">create_walls</span>()
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- at the end of _draw:</span>
+<span class="c-kw">if</span> debug_on <span class="c-kw">then</span>
+  <span class="c-fn">physics_draw</span>(<span class="c-num">8</span>)
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step" id="step-5">
+        <div class="step-header">
+          <span class="step-number">STEP 5</span>
+          <span class="step-title">Entity placement</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Add bumpers, pegs, and flipper pivot positions to <code>layout.lua</code>. Use the <strong>circ mode</strong> of the measuring tool to find centre coordinates and radii.</p>
+            <p>We draw them visually so we can see the layout, but we <strong>don't create physics bodies yet</strong> &mdash; those come later when we implement each mechanic. For now it's just data and drawing.</p>
+            <p>Flipper pivots are marked with small crosses. They don't need a radius since flippers are rectangles.</p>
+            <div class="gif-container">
+              <img src="step-05-entity-placement.gif" alt="Step 5: entities placed" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">layout.lua</div>
+<pre><span class="c-kw">return</span> {
+  lines = {
+    <span class="c-comment">-- ... walls from step 3 ...</span>
+  },
+
+  bumpers = {
+    { x = <span class="c-num">40</span>, y = <span class="c-num">70</span>, r = <span class="c-num">8</span> },
+    { x = <span class="c-num">75</span>, y = <span class="c-num">55</span>, r = <span class="c-num">8</span> },
+    { x = <span class="c-num">57</span>, y = <span class="c-num">100</span>, r = <span class="c-num">8</span> },
+    { x = <span class="c-num">30</span>, y = <span class="c-num">130</span>, r = <span class="c-num">6</span> },
+    { x = <span class="c-num">80</span>, y = <span class="c-num">135</span>, r = <span class="c-num">6</span> },
+  },
+
+  pegs = {
+    { x = <span class="c-num">20</span>, y = <span class="c-num">50</span>, r = <span class="c-num">3</span> },
+    { x = <span class="c-num">95</span>, y = <span class="c-num">80</span>, r = <span class="c-num">3</span> },
+    { x = <span class="c-num">50</span>, y = <span class="c-num">150</span>, r = <span class="c-num">3</span> },
+    { x = <span class="c-num">70</span>, y = <span class="c-num">170</span>, r = <span class="c-num">3</span> },
+  },
+
+  flippers = {
+    left  = { x = <span class="c-num">20</span>, y = <span class="c-num">236</span> },
+    right = { x = <span class="c-num">108</span>, y = <span class="c-num">236</span> },
+  },
+
+  launcher = { x = <span class="c-num">136</span>, y = <span class="c-num">220</span> },
+}</pre>
+            </div>
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">function</span> <span class="c-fn">draw_entities</span>()
+  <span class="c-comment">-- bumpers</span>
+  <span class="c-kw">for</span> _, b <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.bumpers) <span class="c-kw">do</span>
+    <span class="c-fn">circf</span>(b.x, b.y, b.r, <span class="c-num">10</span>)
+    <span class="c-fn">circ</span>(b.x, b.y, b.r, <span class="c-num">0</span>)
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- pegs</span>
+  <span class="c-kw">for</span> _, p <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.pegs) <span class="c-kw">do</span>
+    <span class="c-fn">circ</span>(p.x, p.y, p.r, <span class="c-num">6</span>)
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- flipper pivots</span>
+  <span class="c-kw">local</span> fl = layout.flippers.left
+  <span class="c-kw">local</span> fr = layout.flippers.right
+  <span class="c-fn">line</span>(fl.x - <span class="c-num">3</span>, fl.y, fl.x + <span class="c-num">3</span>, fl.y, <span class="c-num">9</span>)
+  <span class="c-fn">line</span>(fl.x, fl.y - <span class="c-num">3</span>, fl.x, fl.y + <span class="c-num">3</span>, <span class="c-num">9</span>)
+  <span class="c-fn">line</span>(fr.x - <span class="c-num">3</span>, fr.y, fr.x + <span class="c-num">3</span>, fr.y, <span class="c-num">9</span>)
+  <span class="c-fn">line</span>(fr.x, fr.y - <span class="c-num">3</span>, fr.x, fr.y + <span class="c-num">3</span>, <span class="c-num">9</span>)
+
+  <span class="c-comment">-- launcher position</span>
+  <span class="c-kw">local</span> la = layout.launcher
+  <span class="c-fn">pset</span>(la.x, la.y, <span class="c-num">7</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- in _draw, after draw_walls:</span>
+<span class="c-comment">-- draw_entities()</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step" id="step-6">
+        <div class="step-header">
+          <span class="step-number">STEP 6</span>
+          <span class="step-title">Launcher</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Time for physics! The ball starts as a <strong>static</strong> body sitting on the launcher. Hold <strong>down</strong> to pull the launcher back &mdash; the ball follows it down. Release to fire.</p>
+            <p>On release, the static ball is destroyed and recreated as a <strong>dynamic</strong> body with an upward <code>body_impulse</code>. A simple state machine tracks <code>ready</code> &rarr; <code>charging</code> &rarr; <code>playing</code>.</p>
+            <p>We call <code>physics_step(DT)</code> every frame to advance the simulation &mdash; without this, nothing moves.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>gravity(gx, gy)</code> <span>set global gravity vector</span></div>
+              <div><code>physics_step(dt)</code> <span>advance the simulation &mdash; must be called every frame</span></div>
+              <div><code>body(x, y, opts)</code> <span>create a physics body</span></div>
+              <div><code>body_pos(id)</code> <span>get body position &mdash; returns x, y</span></div>
+              <div><code>body_set_pos(id, x, y)</code> <span>move a body to a position</span></div>
+              <div><code>body_impulse(id, ix, iy)</code> <span>apply an instant force</span></div>
+              <div><code>body_destroy(id)</code> <span>remove a body from the world</span></div>
+              <div><code>btn(name)</code> <span>true while a button is held</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-06-launcher.gif" alt="Step 6: launcher" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> ball
+<span class="c-kw">local</span> ball_r = <span class="c-num">3</span>
+<span class="c-kw">local</span> state = <span class="c-str">"ready"</span>
+<span class="c-kw">local</span> launch_charge = <span class="c-num">0</span>
+<span class="c-kw">local</span> launch_max = <span class="c-num">1.0</span>
+<span class="c-kw">local</span> launch_power = <span class="c-num">400</span>
+<span class="c-kw">local</span> launch_pull = <span class="c-num">15</span>
+
+<span class="c-kw">function</span> <span class="c-fn">pull_y</span>()
+  <span class="c-kw">return</span> (launch_charge / launch_max) * launch_pull
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">spawn_ball</span>()
+  <span class="c-kw">if</span> ball <span class="c-kw">then</span> <span class="c-fn">body_destroy</span>(ball) <span class="c-kw">end</span>
+  <span class="c-kw">local</span> la = layout.launcher
+  ball = <span class="c-fn">body</span>(la.x, la.y, {
+    shape = <span class="c-str">"circ"</span>, kind = <span class="c-str">"static"</span>,
+    r = ball_r, bounce = <span class="c-num">0.4</span>,
+    friction = <span class="c-num">0.3</span>,
+  })
+  state = <span class="c-str">"ready"</span>
+  launch_charge = <span class="c-num">0</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">launch_ball</span>(power)
+  <span class="c-kw">local</span> la = layout.launcher
+  <span class="c-fn">body_destroy</span>(ball)
+  ball = <span class="c-fn">body</span>(la.x, la.y, {
+    shape = <span class="c-str">"circ"</span>, kind = <span class="c-str">"dynamic"</span>,
+    r = ball_r, bounce = <span class="c-num">0.4</span>,
+    friction = <span class="c-num">0.3</span>, mass = <span class="c-num">1</span>,
+  })
+  <span class="c-fn">body_impulse</span>(ball, <span class="c-num">0</span>, -power)
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_init</span>()
+  <span class="c-fn">gravity</span>(<span class="c-num">0</span>, <span class="c-num">100</span>)
+  <span class="c-fn">create_walls</span>()
+  <span class="c-fn">spawn_ball</span>()
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- debug toggle + measure tool ...</span>
+
+  <span class="c-fn">physics_step</span>(DT)
+  <span class="c-kw">if not</span> ball <span class="c-kw">then return end</span>
+
+  <span class="c-kw">local</span> la = layout.launcher
+
+  <span class="c-kw">if</span> state == <span class="c-str">"ready"</span> <span class="c-kw">then</span>
+    <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"down"</span>) <span class="c-kw">then</span>
+      launch_charge = <span class="c-num">0</span>
+      state = <span class="c-str">"charging"</span>
+    <span class="c-kw">end</span>
+  <span class="c-kw">elseif</span> state == <span class="c-str">"charging"</span> <span class="c-kw">then</span>
+    <span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"down"</span>) <span class="c-kw">then</span>
+      launch_charge = <span class="c-fn">min</span>(
+        launch_charge + DT, launch_max)
+      <span class="c-fn">body_set_pos</span>(ball,
+        la.x, la.y + <span class="c-fn">pull_y</span>())
+    <span class="c-kw">else</span>
+      <span class="c-kw">local</span> power = (launch_charge
+        / launch_max) * launch_power
+      <span class="c-fn">launch_ball</span>(power)
+      state = <span class="c-str">"playing"</span>
+    <span class="c-kw">end</span>
+  <span class="c-kw">elseif</span> state == <span class="c-str">"playing"</span> <span class="c-kw">then</span>
+    <span class="c-kw">local</span> _, by = <span class="c-fn">body_pos</span>(ball)
+    <span class="c-kw">if</span> by > H + <span class="c-num">10</span> <span class="c-kw">then</span>
+      <span class="c-fn">spawn_ball</span>()
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>(<span class="c-num">1</span>)
+  <span class="c-fn">draw_walls</span>()
+  <span class="c-fn">draw_entities</span>()
+
+  <span class="c-comment">-- launcher</span>
+  <span class="c-kw">local</span> la = layout.launcher
+  <span class="c-kw">local</span> top = la.y + <span class="c-fn">pull_y</span>() + ball_r + <span class="c-num">2</span>
+  <span class="c-fn">rectf</span>(<span class="c-num">130</span>, <span class="c-num">64</span>, <span class="c-num">142</span>, H, <span class="c-num">2</span>)
+  <span class="c-fn">rectf</span>(<span class="c-num">132</span>, top, <span class="c-num">140</span>, H - <span class="c-num">2</span>, <span class="c-num">10</span>)
+
+  <span class="c-comment">-- ball</span>
+  <span class="c-kw">if</span> ball <span class="c-kw">then</span>
+    <span class="c-kw">local</span> bx, by = <span class="c-fn">body_pos</span>(ball)
+    <span class="c-fn">circf</span>(bx, by, ball_r, <span class="c-num">16</span>)
+    <span class="c-fn">circ</span>(bx, by, ball_r, <span class="c-num">0</span>)
+  <span class="c-kw">end</span>
+
+  <span class="c-comment">-- debug ...</span>
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="step" id="step-7">
+        <div class="step-header">
+          <span class="step-number">STEP 7</span>
+          <span class="step-title">Ball reset</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>When the ball falls below the playfield, it's drained. Decrement the life counter and respawn. When all balls are lost, reset the score and start over.</p>
+            <p>We also disable the debug overlay by default now &mdash; you can still toggle it with <strong>B</strong> if you need it.</p>
+            <div class="gif-container">
+              <img src="step-07-reset-ball.gif" alt="Step 7: ball drain and respawn" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> score = <span class="c-num">0</span>
+<span class="c-kw">local</span> balls_left = <span class="c-num">3</span>
+<span class="c-kw">local</span> debug_on = <span class="c-kw">false</span> <span class="c-comment">-- off by default now</span>
+
+<span class="c-comment">-- in _update, replace the playing state:</span>
+<span class="c-kw">elseif</span> state == <span class="c-str">"playing"</span> <span class="c-kw">then</span>
+  <span class="c-kw">local</span> _, by = <span class="c-fn">body_pos</span>(ball)
+  <span class="c-kw">if</span> by > H + <span class="c-num">10</span> <span class="c-kw">then</span>
+    balls_left = balls_left - <span class="c-num">1</span>
+    <span class="c-kw">if</span> balls_left > <span class="c-num">0</span> <span class="c-kw">then</span>
+      <span class="c-fn">spawn_ball</span>()
+    <span class="c-kw">else</span>
+      score = <span class="c-num">0</span>
+      balls_left = <span class="c-num">3</span>
+      <span class="c-fn">spawn_ball</span>()
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="step" id="step-8">
+        <div class="step-header">
+          <span class="step-number">STEP 8</span>
+          <span class="step-title">Bumpers &amp; collisions</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Now we create <strong>physics bodies</strong> for the bumpers and pegs using the positions from <code>layout.lua</code>.</p>
+            <p>Bumpers have <code>bounce = 1.5</code> &mdash; above 1.0 means the ball leaves <em>faster</em> than it arrived. Classic pinball energy boost.</p>
+            <p>We define a <strong>collision callback</strong> <code>_on_collide</code> to detect hits, award points, and shake the screen. Instead of tracking timers manually, we use the <strong>tween system</strong> to animate the hit effect.</p>
+            <p><code>tween()</code> animates properties on a table over time. <code>chain()</code> sequences tweens so they play one after another &mdash; here we expand the bumper border outward, then spring it back with an elastic ease. The <code>on_complete</code> callback resets the colour when the animation finishes.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_on_collide(a, b)</code> <span>magic function called when two bodies collide &mdash; receives both body IDs</span></div>
+              <div><code>cam_shake(intensity, duration)</code> <span>screen shake effect</span></div>
+              <div><code>tween(target, duration, props, ease)</code> <span>animate properties on a table over time</span></div>
+              <div><code>chain(...)</code> <span>play tweens in sequence &mdash; each starts when the previous finishes</span></div>
+              <div><code>tween_cancel(handle)</code> <span>stop a running tween</span></div>
+              <div><code>Ease</code> <span>easing curves &mdash; <code>Ease.Quad</code>, <code>Ease.Elastic</code>, <code>Ease.Bounce</code>, etc.</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-08-bumpers-collisions.gif" alt="Step 8: bumpers" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> bumpers = {}
+<span class="c-kw">local</span> pegs = {}
+
+<span class="c-kw">function</span> <span class="c-fn">create_bumpers</span>()
+  <span class="c-kw">for</span> _, b <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.bumpers) <span class="c-kw">do</span>
+    <span class="c-kw">local</span> id = <span class="c-fn">body</span>(b.x, b.y, {
+      shape = <span class="c-str">"circ"</span>,
+      kind = <span class="c-str">"static"</span>,
+      r = b.r, bounce = <span class="c-num">1.5</span>,
+      friction = <span class="c-num">0.1</span>,
+    })
+    <span class="c-fn">add</span>(bumpers, {
+      id = id, x = b.x, y = b.y,
+      r = b.r,
+      col = <span class="c-num">10</span>,
+      border_r = b.r - <span class="c-num">1</span>,
+      tw = <span class="c-kw">nil</span>,
+    })
+  <span class="c-kw">end</span>
+
+  <span class="c-kw">for</span> _, p <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(layout.pegs) <span class="c-kw">do</span>
+    <span class="c-kw">local</span> id = <span class="c-fn">body</span>(p.x, p.y, {
+      shape = <span class="c-str">"circ"</span>,
+      kind = <span class="c-str">"static"</span>,
+      r = p.r, bounce = <span class="c-num">0.4</span>,
+      friction = <span class="c-num">0.2</span>,
+    })
+    <span class="c-fn">add</span>(pegs, {
+      id = id, x = p.x, y = p.y,
+      r = p.r,
+    })
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">bumper_hit</span>(bmp)
+  <span class="c-comment">-- cancel any running animation</span>
+  <span class="c-kw">if</span> bmp.tw <span class="c-kw">then</span>
+    <span class="c-fn">tween_cancel</span>(bmp.tw)
+  <span class="c-kw">end</span>
+
+  bmp.col = <span class="c-num">7</span> <span class="c-comment">-- flash white</span>
+  bmp.border_r = bmp.r - <span class="c-num">1</span>
+
+  <span class="c-comment">-- expand border out, then spring back</span>
+  bmp.tw = <span class="c-fn">chain</span>(
+    <span class="c-fn">tween</span>(bmp, <span class="c-num">0.1</span>,
+      { border_r = bmp.r + <span class="c-num">3</span> },
+      Ease.Quad),
+    <span class="c-fn">tween</span>(bmp, <span class="c-num">0.3</span>,
+      { border_r = bmp.r - <span class="c-num">1</span> },
+      Ease.Elastic),
+    <span class="c-kw">function</span>()
+      bmp.col = <span class="c-num">10</span>
+      bmp.tw = <span class="c-kw">nil</span>
+    <span class="c-kw">end</span>
+  )
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_on_collide</span>(a_id, b_id)
+  <span class="c-kw">for</span> _, bmp <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(bumpers) <span class="c-kw">do</span>
+    <span class="c-kw">if</span> a_id == bmp.id
+      <span class="c-kw">or</span> b_id == bmp.id
+    <span class="c-kw">then</span>
+      <span class="c-fn">bumper_hit</span>(bmp)
+      score = score + <span class="c-num">100</span>
+      <span class="c-fn">cam_shake</span>(<span class="c-num">2</span>, <span class="c-num">0.2</span>)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- add to _init:</span>
+<span class="c-comment">-- create_bumpers()</span>
+
+<span class="c-comment">-- replace draw_entities bumper/peg drawing:</span>
+<span class="c-kw">for</span> _, bmp <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(bumpers) <span class="c-kw">do</span>
+  <span class="c-fn">circf</span>(bmp.x, bmp.y, bmp.r, bmp.col)
+  <span class="c-fn">circ</span>(bmp.x, bmp.y, bmp.r, <span class="c-num">1</span>)
+  <span class="c-fn">circ</span>(bmp.x, bmp.y, bmp.border_r, <span class="c-num">7</span>)
+<span class="c-kw">end</span>
+
+<span class="c-kw">for</span> _, p <span class="c-kw">in</span> <span class="c-fn">ipairs</span>(pegs) <span class="c-kw">do</span>
+  <span class="c-fn">circ</span>(p.x, p.y, p.r, <span class="c-num">6</span>)
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 9 -->
+      <div class="step" id="step-9">
+        <div class="step-header">
+          <span class="step-number">STEP 9</span>
+          <span class="step-title">Flippers</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Flippers are <strong>kinematic bodies</strong>. Unlike dynamic bodies, they don't respond to forces or gravity &mdash; you control them entirely with code. But they <em>do</em> push dynamic bodies (the ball) when they move.</p>
+            <p>We define the flipper shape as a <strong>polygon</strong> &mdash; a trapezoid that's fat at the pivot and thin at the tip. The points start at x=&minus;1 (the pivot end) and extend out to <code>flip_len</code>, so the body rotates from the edge, not the centre.</p>
+            <p>Press left arrow for the left flipper, right arrow for the right. We set <code>body_set_angular_vel</code> each frame so the physics engine moves them, then read back the actual angle with <code>body_angle</code> and clamp it to the allowed range.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>body(x, y, { shape = "poly", points = {} })</code> <span>polygon body from a flat list of x,y pairs</span></div>
+              <div><code>body_set_angular_vel(id, vel)</code> <span>set rotational speed (radians/sec)</span></div>
+              <div><code>body_angle(id)</code> <span>read back the current angle after physics step</span></div>
+              <div><code>mid(lo, val, hi)</code> <span>clamp a value between lo and hi</span></div>
+              <div><code>polyf(pts, col)</code>, <code>poly(pts, col)</code> <span>draw filled/outlined polygon</span></div>
+            </div>
+            <p>Run the game and try the flippers. If the positions don't feel right, go back to <code>layout.lua</code> and adjust the flipper x/y values &mdash; use the measuring tool to find coordinates that sit nicely above the drain walls.</p>
+            <div class="gif-container">
+              <img src="step-09-flippers-1.gif" alt="Step 9: flippers shape" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+              <img src="step-09-flippers-2.gif" alt="Step 9: flippers in action" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> flip_l, flip_r
+<span class="c-kw">local</span> flip_len = <span class="c-num">36</span>
+<span class="c-kw">local</span> flip_fat = <span class="c-num">5</span>
+<span class="c-kw">local</span> flip_thin = <span class="c-num">2</span>
+<span class="c-kw">local</span> flip_rest = <span class="c-num">0.35</span>
+<span class="c-kw">local</span> flip_active = <span class="c-num">-0.6</span>
+<span class="c-kw">local</span> flip_up_speed = <span class="c-num">12</span>
+<span class="c-kw">local</span> flip_down_speed = <span class="c-num">4</span>
+<span class="c-kw">local</span> flip_l_angle = <span class="c-num">0</span>
+<span class="c-kw">local</span> flip_r_angle = <span class="c-num">0</span>
+
+<span class="c-comment">-- tapered shape: fat at pivot, thin at tip</span>
+<span class="c-kw">local</span> l_pts = {
+  <span class="c-num">-1</span>, -flip_fat,
+  flip_len, -flip_thin,
+  flip_len,  flip_thin,
+  <span class="c-num">-1</span>,  flip_fat,
+}
+<span class="c-kw">local</span> r_pts = {
+  <span class="c-num">1</span>, -flip_fat,
+  -flip_len, -flip_thin,
+  -flip_len,  flip_thin,
+  <span class="c-num">1</span>,  flip_fat,
+}
+
+<span class="c-kw">function</span> <span class="c-fn">create_flippers</span>()
+  <span class="c-kw">local</span> fl = layout.flippers.left
+  <span class="c-kw">local</span> fr = layout.flippers.right
+  flip_l = <span class="c-fn">body</span>(fl.x, fl.y, {
+    shape = <span class="c-str">"poly"</span>,
+    kind = <span class="c-str">"kinematic"</span>,
+    points = l_pts,
+    friction = <span class="c-num">0.8</span>, bounce = <span class="c-num">0.3</span>,
+  })
+  flip_l_angle = flip_rest
+
+  flip_r = <span class="c-fn">body</span>(fr.x, fr.y, {
+    shape = <span class="c-str">"poly"</span>,
+    kind = <span class="c-str">"kinematic"</span>,
+    points = r_pts,
+    friction = <span class="c-num">0.8</span>, bounce = <span class="c-num">0.3</span>,
+  })
+  flip_r_angle = -flip_rest
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- add to _init:</span>
+<span class="c-comment">-- create_flippers()</span>
+
+<span class="c-comment">-- in _update, before physics_step:</span>
+<span class="c-kw">local</span> target_l = flip_rest
+<span class="c-kw">local</span> target_r = -flip_rest
+<span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"left"</span>) <span class="c-kw">then</span>
+  target_l = flip_active
+<span class="c-kw">end</span>
+<span class="c-kw">if</span> <span class="c-fn">btn</span>(<span class="c-str">"right"</span>) <span class="c-kw">then</span>
+  target_r = -flip_active
+<span class="c-kw">end</span>
+
+<span class="c-kw">local</span> diff_l = target_l - flip_l_angle
+<span class="c-kw">local</span> diff_r = target_r - flip_r_angle
+<span class="c-kw">local</span> spd_l = (diff_l < <span class="c-num">0</span>)
+  <span class="c-kw">and</span> flip_up_speed <span class="c-kw">or</span> flip_down_speed
+<span class="c-kw">local</span> spd_r = (diff_r > <span class="c-num">0</span>)
+  <span class="c-kw">and</span> flip_up_speed <span class="c-kw">or</span> flip_down_speed
+<span class="c-fn">body_set_angular_vel</span>(flip_l, diff_l * spd_l)
+<span class="c-fn">body_set_angular_vel</span>(flip_r, diff_r * spd_r)
+
+<span class="c-comment">-- after physics_step, read back and clamp:</span>
+flip_l_angle = <span class="c-fn">body_angle</span>(flip_l)
+flip_r_angle = <span class="c-fn">body_angle</span>(flip_r)
+flip_l_angle = <span class="c-fn">mid</span>(
+  flip_active, flip_l_angle, flip_rest)
+flip_r_angle = <span class="c-fn">mid</span>(
+  -flip_rest, flip_r_angle, -flip_active)
+<span class="c-fn">body_set_angle</span>(flip_l, flip_l_angle)
+<span class="c-fn">body_set_angle</span>(flip_r, flip_r_angle)
+
+<span class="c-comment">-- drawing a rotated flipper:</span>
+<span class="c-kw">function</span> <span class="c-fn">draw_flipper</span>(fx, fy, pts, angle)
+  <span class="c-kw">local</span> c, s = <span class="c-fn">cos</span>(angle), <span class="c-fn">sin</span>(angle)
+  <span class="c-kw">local</span> rotated = {}
+  <span class="c-kw">for</span> i = <span class="c-num">1</span>, #pts, <span class="c-num">2</span> <span class="c-kw">do</span>
+    <span class="c-kw">local</span> lx, ly = pts[i], pts[i + <span class="c-num">1</span>]
+    <span class="c-fn">add</span>(rotated, fx + lx * c - ly * s)
+    <span class="c-fn">add</span>(rotated, fy + lx * s + ly * c)
+  <span class="c-kw">end</span>
+  <span class="c-fn">polyf</span>(rotated, <span class="c-num">9</span>)
+  <span class="c-fn">poly</span>(rotated, <span class="c-num">0</span>)
+<span class="c-kw">end</span>
+
+<span class="c-comment">-- in _draw:</span>
+<span class="c-kw">local</span> fl = layout.flippers.left
+<span class="c-kw">local</span> fr = layout.flippers.right
+<span class="c-fn">draw_flipper</span>(fl.x, fl.y, l_pts, flip_l_angle)
+<span class="c-fn">draw_flipper</span>(fr.x, fr.y, r_pts, flip_r_angle)</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 10 -->
+      <div class="step" id="step-10">
+        <div class="step-header">
+          <span class="step-number">STEP 10</span>
+          <span class="step-title">UI</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>Add a HUD with score and remaining balls. The <code>_ui()</code> callback draws after <code>_draw()</code> and <strong>isn't affected by the camera</strong> &mdash; perfect for score displays. This matters in the next step when we add camera follow.</p>
+            <p>We also show a blinking "hold down to launch" hint when the ball is ready.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>_ui()</code> <span>called every frame for HUD overlay &mdash; not affected by camera</span></div>
+              <div><code>font_style(n)</code> <span>switch font size (1 = small, 2 = large)</span></div>
+              <div><code>text_width(str)</code> <span>pixel width of a string in the current font</span></div>
+              <div><code>printo(text, x, y, col, outline)</code> <span>print with an outline color</span></div>
+              <div><code>INPUT_GLYPH</code> <span>table of button glyph strings (DOWN, LEFT, RIGHT, etc.)</span></div>
+            </div>
+            <div class="gif-container">
+              <img src="step-10-ui.gif" alt="Step 10: UI overlay" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">function</span> <span class="c-fn">_ui</span>()
+  <span class="c-fn">font_style</span>(<span class="c-num">2</span>)
+  <span class="c-comment">-- score</span>
+  <span class="c-kw">local</span> sw = <span class="c-fn">text_width</span>(<span class="c-fn">tostring</span>(score))
+  <span class="c-fn">rectf</span>(<span class="c-num">-5</span>, <span class="c-num">3</span>, sw + <span class="c-num">4</span>, <span class="c-num">16</span>, <span class="c-num">1</span>)
+  <span class="c-fn">rect</span>(<span class="c-num">-5</span>, <span class="c-num">3</span>, sw + <span class="c-num">4</span>, <span class="c-num">16</span>, <span class="c-num">7</span>)
+  <span class="c-fn">print</span>(score, <span class="c-num">3</span>, <span class="c-num">2</span>, <span class="c-num">16</span>)
+
+  <span class="c-comment">-- balls remaining</span>
+  <span class="c-fn">rectf</span>(<span class="c-num">114</span>, <span class="c-num">3</span>, <span class="c-num">133</span>, <span class="c-num">16</span>, <span class="c-num">1</span>)
+  <span class="c-fn">rect</span>(<span class="c-num">114</span>, <span class="c-num">3</span>, <span class="c-num">133</span>, <span class="c-num">16</span>, <span class="c-num">7</span>)
+  <span class="c-fn">print</span>(balls_left, <span class="c-num">118</span>, <span class="c-num">2</span>, <span class="c-num">16</span>)
+  <span class="c-fn">font_style</span>(<span class="c-num">1</span>)
+
+  <span class="c-comment">-- launch hint</span>
+  <span class="c-kw">if</span> state == <span class="c-str">"ready"</span> <span class="c-kw">and</span> ball <span class="c-kw">then</span>
+    <span class="c-kw">if</span> <span class="c-fn">flr</span>(T * <span class="c-num">3</span>) % <span class="c-num">2</span> == <span class="c-num">0</span> <span class="c-kw">then</span>
+      <span class="c-fn">printo</span>(<span class="c-str">"HOLD "</span>
+        .. INPUT_GLYPH.DOWN
+        .. <span class="c-str">" TO LAUNCH"</span>,
+        <span class="c-num">12</span>, <span class="c-num">200</span>, <span class="c-num">16</span>, <span class="c-num">1</span>)
+    <span class="c-kw">end</span>
+  <span class="c-kw">end</span>
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 11 -->
+      <div class="step" id="step-11">
+        <div class="step-header">
+          <span class="step-number">STEP 11</span>
+          <span class="step-title">Camera follow</span>
+        </div>
+        <div class="step-split">
+          <div class="step-docs">
+            <p>The playfield is 256 pixels tall but we only want to show 128 at a time. Change the resolution back to <strong>128&times;128</strong> and add camera follow so the view tracks the ball.</p>
+            <p><code>cam_follow</code> smoothly moves the camera toward the ball. The <code>time</code> parameter controls smoothness &mdash; <code>0.15</code> gives a responsive but buttery follow.</p>
+            <p><code>cam_bounds</code> prevents the camera from showing empty space beyond the playfield edges. And <code>cam_offset</code> with a velocity-based offset gives the player a preview of where the ball is heading.</p>
+            <div class="api-intro">New functions:</div>
+            <div class="api-list">
+              <div><code>cam_follow(x, y, time)</code> <span>smoothly move camera toward a point</span></div>
+              <div><code>cam_bounds(x1, y1, x2, y2)</code> <span>clamp camera within bounds</span></div>
+              <div><code>cam_offset(ox, oy)</code> <span>offset from the follow target</span></div>
+              <div><code>body_vel(id)</code> <span>get velocity &mdash; returns vx, vy</span></div>
+            </div>
+            <p>Note that <code>_ui()</code> still draws in screen space &mdash; the score and ball count stay fixed in the corners regardless of where the camera is.</p>
+            <div class="gif-container">
+              <img src="step-11-camera.gif" alt="Step 11: camera follow" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
+            </div>
+          </div>
+          <div class="step-code">
+            <div class="code-block">
+              <div class="code-label">conf.d8</div>
+<pre><span class="c-kw">return</span> {
+  title = <span class="c-str">"Pinball"</span>,
+  version = <span class="c-str">"0.1.0"</span>,
+  author = <span class="c-str">"Dino Dev"</span>,
+  engine = <span class="c-num">0</span>,
+  width = <span class="c-num">128</span>,
+  height = <span class="c-num">128</span>,
+  scale = <span class="c-num">3</span>,
+  entry = <span class="c-str">"main.d8"</span>,
+}</pre>
+            </div>
+            <div class="code-block">
+              <div class="code-label">main.d8</div>
+<pre><span class="c-kw">local</span> look_ahead = <span class="c-num">0</span>
+
+<span class="c-comment">-- in _init:</span>
+<span class="c-fn">cam_bounds</span>(<span class="c-num">0</span>, <span class="c-num">0</span>, W + GRID * <span class="c-num">6</span>, H)
+
+<span class="c-comment">-- in _update, after physics_step:</span>
+<span class="c-kw">if</span> ball <span class="c-kw">then</span>
+  <span class="c-kw">local</span> bx, by = <span class="c-fn">body_pos</span>(ball)
+  <span class="c-kw">local</span> _, vy = <span class="c-fn">body_vel</span>(ball)
+
+  <span class="c-comment">-- look ahead based on velocity</span>
+  <span class="c-kw">local</span> target = (vy / <span class="c-num">200</span>) * <span class="c-num">32</span>
+  target = <span class="c-fn">mid</span>(<span class="c-num">-32</span>, target, <span class="c-num">32</span>)
+  look_ahead = look_ahead
+    + (target - look_ahead)
+    * <span class="c-fn">min</span>(<span class="c-num">1</span>, <span class="c-num">8</span> * DT)
+
+  <span class="c-fn">cam_follow</span>(bx, by, <span class="c-num">0.15</span>)
+  <span class="c-fn">cam_offset</span>(<span class="c-num">0</span>, look_ahead)
+<span class="c-kw">end</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHAT NEXT -->
+      <div class="final-section" style="margin-top: 1.5rem;">
+        <h2>WHAT NEXT</h2>
+        <p>You now know the physics workflow: create bodies, handle collisions, and control kinematic objects. From here you can:</p>
+        <ul style="color: var(--dim); font-size: 0.85rem; margin-left: 1rem; margin-top: 0.5rem;">
+          <li>Add sound effects for flippers, bumpers, and drain</li>
+          <li>Score multipliers and combo tracking</li>
+          <li>Ramps and tunnels with more edge walls</li>
+          <li>Particle effects on bumper hits</li>
+        </ul>
+        <p style="margin-top: 0.75rem;">Check out the full example with <code>dino8 examples</code> to see all of these in action.</p>
+      </div>
+
+    </main>
+  </div>
+  <script src="../tutorial.js"></script>
+</body>
+</html>

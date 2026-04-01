@@ -1,4 +1,4 @@
--- conf.lua
+-- conf.d8
 return {
 	title = "demo",
 	description = "A Dino8 game",

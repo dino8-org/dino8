@@ -43,7 +43,7 @@
   <pre><span class="t-prompt">$</span> dino8 create breakout --empty
 <span class="t-prompt">$</span> cd breakout</pre>
 </div>
-            <p style="margin-top: 1rem;">Open <code>conf.lua</code> and set the display size. The <code>scale</code> sets the window multiplier so each pixel is drawn 4&times;4 on screen.</p>
+            <p style="margin-top: 1rem;">Open <code>conf.d8</code> and set the display size. The <code>scale</code> sets the window multiplier so each pixel is drawn 4&times;4 on screen.</p>
             <p>We also define our sound effects up front in <code>sfx_clips</code>. Each clip has a <code>path</code> to a wav file and a <code>pitch</code> range &mdash; the engine picks a random pitch between the two values each time it plays, so repeated sounds don't feel robotic.</p>
             <p>Grab the tutorial sound effects with the <code>get</code> command. Run this from inside your project folder &mdash; it downloads and extracts the wav files into <code>assets/audio/</code> automatically:</p>
 <div class="terminal">
@@ -54,7 +54,7 @@
           </div>
           <div class="step-code">
             <div class="code-block">
-              <div class="code-label">conf.lua</div>
+              <div class="code-label">conf.d8</div>
 <pre><span class="c-kw">return</span> {
   title = <span class="c-str">"Breakout"</span>,
   version = <span class="c-str">"0.1.0"</span>,
@@ -170,7 +170,7 @@
               <div><code>circf(x,y,r,c)</code> <span>filled circle</span></div>
               <div><code>sfx(clip)</code> <span>play a sound effect</span></div>
             </div>
-            <p>We also play the <code>thud</code> sound effect we configured in <code>conf.lua</code>. The <code>sfx_clips</code> table is a global &mdash; use <code>sfx(sfx_clips.thud)</code> to play a clip.</p>
+            <p>We also play the <code>thud</code> sound effect we configured in <code>conf.d8</code>. The <code>sfx_clips</code> table is a global &mdash; use <code>sfx(sfx_clips.thud)</code> to play a clip.</p>
             <p>The ball moves diagonally upward. It bounces off the left, right, and top walls but passes through the bottom &mdash; we'll handle that in step 6.</p>
             <div class="gif-container">
               <img src="step-04-ball.gif" alt="Step 4: ball bouncing off walls" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
@@ -456,13 +456,6 @@
               <div><code>cam_shake(intensity, duration)</code> <span>screen shake effect</span></div>
             </div>
             <p>Just add one line inside the brick collision block. The screen will jolt briefly on each hit.</p>
-            <p style="margin-top: 1.5rem; color: var(--text);">That's it &mdash; you've built a complete breakout game! From here you can extend it with:</p>
-            <ul style="color: var(--dim); font-size: 0.85rem; margin-left: 1rem; margin-top: 0.5rem;">
-              <li>Lives and game over screen</li>
-              <li>Multiple levels with harder bricks</li>
-              <li>Power-ups (bigger paddle, multi-ball)</li>
-            </ul>
-            <p style="margin-top: 0.75rem;">Check out the full example with <code>dino8 examples</code> to see all of these in action.</p>
             <div class="gif-container">
               <img src="step-10-polish.gif" alt="Step 10: finished game with shake" onerror="this.parentElement.innerHTML='<div class=gif-placeholder>coming soon</div>'">
             </div>
@@ -490,12 +483,24 @@
           </div>
         </div>
       </div>
+      <!-- WHAT NEXT -->
+      <div class="final-section" style="margin-top: 1.5rem;">
+        <h2>WHAT NEXT</h2>
+        <p>You've built a complete breakout game from scratch. From here you can:</p>
+        <ul style="color: var(--dim); font-size: 0.85rem; margin-left: 1rem; margin-top: 0.5rem;">
+          <li>Lives and game over screen</li>
+          <li>Multiple levels with harder bricks</li>
+          <li>Power-ups (bigger paddle, multi-ball)</li>
+        </ul>
+        <p style="margin-top: 0.75rem;">Check out the full example with <code>dino8 examples</code> to see all of these in action.</p>
+      </div>
+
       <!-- ALTERNATIVES -->
       <div class="final-section" style="margin-top: 1.5rem;">
         <h2>ALTERNATIVES</h2>
         <div class="alt-box">
           <div class="alt-label">LOADING SOUNDS IN CODE</div>
-          <p>Instead of defining sounds in <code>conf.lua</code>, you can load them in code with <code>load_sfx()</code> and store the returned ID:</p>
+          <p>Instead of defining sounds in <code>conf.d8</code>, you can load them in code with <code>load_sfx()</code> and store the returned ID:</p>
 <pre><span class="c-kw">local</span> snd_thud
 <span class="c-kw">local</span> snd_hit
 

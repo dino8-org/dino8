@@ -90,6 +90,15 @@ header p {
   padding-bottom: 0.4rem;
   border-bottom: 1px solid #2a2040;
   margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+  padding-top: 0.5rem;
+}
+
+nav a.active {
+  color: var(--accent);
 }
 
 .note {

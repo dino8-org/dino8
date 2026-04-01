@@ -166,7 +166,7 @@
         <div class="cli-cmd-list">
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game/</span></pre>
-            <p>Run a game from a project directory. Auto-detects <code>conf.lua</code> and launches your game with hot reload — edit your code and see changes instantly without restarting.</p>
+            <p>Run a game from a project directory. Auto-detects <code>conf.d8</code> and launches your game with hot reload — edit your code and see changes instantly without restarting.</p>
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">my-game.fos</span></pre>
@@ -174,7 +174,7 @@
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">create</span> my-game</pre>
-            <p>Scaffold a new game project with the standard directory structure, a starter <code>conf.lua</code>, and a minimal <code>main.d8</code> entry point. The fastest way to start building.</p>
+            <p>Scaffold a new game project with the standard directory structure, a starter <code>conf.d8</code>, and a minimal <code>main.d8</code> entry point. The fastest way to start building.</p>
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">fossilize</span> my-game</pre>
@@ -182,7 +182,7 @@
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">validate</span> my-game/</pre>
-            <p>Check your project structure before packaging. Verifies <code>conf.lua</code> is valid, referenced assets exist, and the entry point is reachable — catches mistakes early.</p>
+            <p>Check your project structure before packaging. Verifies <code>conf.d8</code> is valid, referenced assets exist, and the entry point is reachable — catches mistakes early.</p>
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">export web</span> my-game/</pre>
@@ -206,7 +206,7 @@
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">push</span> my-game/</pre>
-            <p>Publish your game directly to itch.io using butler. Handles fossilizing, web export, and upload in one step — configure your <code>itch</code> table in <code>conf.lua</code> and go.</p>
+            <p>Publish your game directly to itch.io using butler. Handles fossilizing, web export, and upload in one step — configure your <code>itch</code> table in <code>conf.d8</code> and go.</p>
           </div>
           <div class="cli-cmd-item">
             <pre><span class="c-cmd">dino8</span> <span class="c-arg">info</span> my-game.fos</pre>
@@ -590,6 +590,17 @@
           label: "Build Shaders",
           images: [
             "tutorials/shaders-1/shaders-1-01.gif",
+          ],
+        },
+        {
+          title: "Pinball",
+          tags: ["physics", "camera", "input"],
+          description: "Plan a pinball layout with debug tools, build it from a data file, then bring it to life with physics — flippers, bumpers, a spring launcher, and smooth camera follow.",
+          href: "tutorials/physics/",
+          label: "Build Pinball",
+          images: [
+            "tutorials/physics/pinball-01.gif",
+            "tutorials/physics/pinball-02.gif",
           ],
         },
       ];

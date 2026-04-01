@@ -105,7 +105,7 @@
         </div>
         <div class="global">
           <span class="global-name">CONFIG</span> <span class="global-type">table</span>
-          <div class="global-desc">Read-only table of all conf.lua values: .title, .version, .width, .height, .author, .assets, etc.</div>
+          <div class="global-desc">Read-only table of all conf.d8 values: .title, .version, .width, .height, .author, .assets, etc.</div>
         </div>
       </div>
 
@@ -113,9 +113,11 @@
       <div class="section" id="callbacks">
         <h2>CALLBACKS</h2>
         <div class="note">Define these functions in your game. The engine calls them automatically. Drawing is split into two passes: <code>_draw</code> runs in world space (affected by camera), while <code>_ui</code> runs in screen space (ignores camera). Use <code>_draw</code> for gameplay and <code>_ui</code> for HUD, menus, and overlays that should stay fixed on screen.</div>
+        <div class="section-split">
+          <div class="section-docs">
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">_init</span>()</div>
-          <div class="fn-desc">Called once at startup for initialization</div>
+          <div class="fn-sig"><span class="fn-name">_init</span>(<span class="fn-opt">[kwargs]</span>)</div>
+          <div class="fn-desc">Called once at startup for initialization. <code>kwargs</code> is a table of key-value pairs from CLI <code>--key value</code> args passed after the project path. Empty table if no args.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">_update</span>()</div>
@@ -137,6 +139,27 @@
           <div class="fn-sig"><span class="fn-name">_input_changed</span>(<span class="fn-param">mode</span>)</div>
           <div class="fn-desc">Called when input mode changes. mode: "keyboard" | "touch" | "gamepad"</div>
         </div>
+          </div>
+          <div class="section-example">
+            <div class="example-label">main.d8</div>
+<pre class="conf-example"><span class="c-comment">-- run with: dino8 run . --scene cave --debug</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_init</span>(kwargs)
+  <span class="c-comment">-- kwargs = {scene="cave", debug="true"}</span>
+  <span class="c-kw">local</span> scene = kwargs.scene <span class="c-kw">or</span> <span class="c-str">"start"</span>
+  <span class="c-fn">load_scene</span>(scene)
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_update</span>()
+  <span class="c-comment">-- game logic</span>
+<span class="c-kw">end</span>
+
+<span class="c-kw">function</span> <span class="c-fn">_draw</span>()
+  <span class="c-fn">cls</span>()
+  <span class="c-comment">-- render</span>
+<span class="c-kw">end</span></pre>
+          </div>
+        </div>
       </div>
 
       <!-- CONFIGURATION -->
@@ -145,7 +168,7 @@
 
         <div class="conf-split">
           <div class="conf-docs">
-        <div class="note">Every project has a <code>conf.lua</code> that returns a table describing the game. This is where you set the title, resolution, assets, filters, and more. All values are available at runtime via the read-only <code>CONFIG</code> global &mdash; e.g. <code>CONFIG.title</code>, <code>CONFIG.version</code>, <code>CONFIG.width</code>.</div>
+        <div class="note">Every project has a <code>conf.d8</code> that returns a table describing the game. This is where you set the title, resolution, assets, filters, and more. All values are available at runtime via the read-only <code>CONFIG</code> global &mdash; e.g. <code>CONFIG.title</code>, <code>CONFIG.version</code>, <code>CONFIG.width</code>.</div>
 
         <h3 class="conf-subsection">Metadata</h3>
         <table class="conf-table">
@@ -449,7 +472,7 @@
           <span style="background:#DAD45E">15</span>
           <span style="background:#DEEED6">16</span>
         </div>
-        <div class="note">Default: Dawnbringer 16. Custom palettes can be set in conf.lua or at runtime.</div>
+        <div class="note">Default: Dawnbringer 16. Custom palettes can be set in conf.d8 or at runtime.</div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">pal</span>(<span class="fn-opt">[c0, c1]</span>)</div>
           <div class="fn-desc">Map draw color c0 to appear as c1. No args resets.</div>
@@ -505,6 +528,11 @@
           <div class="fn-sig"><span class="fn-name">kerning</span>()</div>
           <div class="fn-ret">&rarr; number</div>
           <div class="fn-desc">Extra letter spacing in pixels for current font</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">chr</span>(<span class="fn-param">codepoint</span>)</div>
+          <div class="fn-ret">&rarr; string</div>
+          <div class="fn-desc">Convert a Unicode codepoint to a UTF-8 string. Use to access any glyph in the font by its codepoint (e.g. <code>chr(0x2082)</code> for subscript 2)</div>
         </div>
       </div>
 
@@ -971,6 +999,10 @@ draw_card()
           <div class="fn-sig"><span class="fn-name">get_repeat_rates</span>()</div>
           <div class="fn-ret">&rarr; initial_ms, repeat_ms</div>
           <div class="fn-desc">Get current repeat rates</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">consume</span>(<span class="fn-param">input</span>)</div>
+          <div class="fn-desc">Mark input as handled for this frame. Prevents the engine from acting on it (e.g., opening pause menu on escape). Resets each frame.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">get_input_mode</span>(<span class="fn-opt">[player]</span>)</div>
@@ -1542,12 +1574,20 @@ draw_card()
           <div class="fn-desc">Apply instant impulse to body</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">on_collide</span>(<span class="fn-param">id_a</span>, <span class="fn-param">id_b</span>, <span class="fn-param">callback</span>)</div>
-          <div class="fn-desc">Register collision callback. callback(a, b) called when bodies begin colliding.</div>
+          <div class="fn-sig"><span class="fn-name">_on_collide</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>)</div>
+          <div class="fn-desc">Called when two bodies begin colliding. Define as a global function.</div>
         </div>
         <div class="fn">
-          <div class="fn-sig"><span class="fn-name">on_separate</span>(<span class="fn-param">id_a</span>, <span class="fn-param">id_b</span>, <span class="fn-param">callback</span>)</div>
-          <div class="fn-desc">Register separation callback. callback(a, b) called when bodies stop colliding.</div>
+          <div class="fn-sig"><span class="fn-name">_on_separate</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>)</div>
+          <div class="fn-desc">Called when two bodies stop colliding. Define as a global function.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_on_sensor_enter</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>)</div>
+          <div class="fn-desc">Called when a sensor body begins overlapping another body. Define as a global function.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">_on_sensor_exit</span>(<span class="fn-param">a</span>, <span class="fn-param">b</span>)</div>
+          <div class="fn-desc">Called when a sensor body stops overlapping another body. Define as a global function.</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">body_group</span>(<span class="fn-param">id</span>, <span class="fn-param">group</span>)</div>
@@ -1798,7 +1838,7 @@ draw_card()
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">screen_size</span>()</div>
           <div class="fn-ret">&rarr; width, height</div>
-          <div class="fn-desc">Get screen dimensions from conf.lua</div>
+          <div class="fn-desc">Get screen dimensions from conf.d8</div>
         </div>
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">get_fullscreen</span>() / <span class="fn-name">set_fullscreen</span>(<span class="fn-param">bool</span>) / <span class="fn-name">toggle_fullscreen</span>()</div>
@@ -2136,6 +2176,30 @@ draw_card()
     document.querySelectorAll('[data-char]').forEach(function(el) {
       el.textContent = String.fromCharCode(parseInt(el.dataset.char, 16));
     });
+  </script>
+  <script>
+    // Highlight active nav link based on scroll position
+    (function() {
+      var sections = document.querySelectorAll('.section[id]');
+      var navLinks = document.querySelectorAll('nav a[href^="#"]');
+      var linkMap = {};
+      navLinks.forEach(function(a) {
+        var id = a.getAttribute('href').replace('#', '');
+        linkMap[id] = a;
+      });
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            navLinks.forEach(function(a) { a.classList.remove('active'); });
+            var link = linkMap[entry.target.id];
+            if (link) link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -70% 0px' });
+
+      sections.forEach(function(sec) { observer.observe(sec); });
+    })();
   </script>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "cc48fbbc3c48445f90d3c06acf5a97f8"}'></script>
 </body>
