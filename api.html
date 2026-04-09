@@ -45,6 +45,8 @@
       <h3>AUDIO</h3>
       <a href="#sfx">Sound Effects</a>
       <a href="#music">Music</a>
+      <a href="#synth">Synth</a>
+      <a href="#scope">Scope</a>
       <h3>DATA</h3>
       <a href="#tables">Table Utilities</a>
       <a href="#math">Math</a>
@@ -72,6 +74,9 @@
       <a href="#http">HTTP</a>
       <a href="#json">JSON</a>
       <a href="#preview">Preview</a>
+      <h3>DEVELOPMENT</h3>
+      <a href="#testing">Testing</a>
+      <a href="#file-formats">File Formats</a>
     </nav>
 
     <main>
@@ -1211,6 +1216,46 @@ draw_card()
         </div>
       </div>
 
+      <!-- SYNTH -->
+      <div class="section" id="synth">
+        <h2>SYNTH</h2>
+        <div class="note">Real-time waveform synthesis. Play notes using built-in oscillators with optional effects processing. Used by the tracker music system and available for custom sound design.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">synth</span>(<span class="fn-param">notes</span>, <span class="fn-opt">[speed]</span>, <span class="fn-opt">[scope_ch]</span>)</div>
+          <div class="fn-ret">&rarr; integer</div>
+          <div class="fn-desc">Synthesize and play a sequence of notes. Each note is a table <code>{pitch, vol, wave, fx}</code>. <code>pitch</code> is 0&ndash;63 (semitones), <code>vol</code> is 0&ndash;7, <code>wave</code> is the oscillator type (0&ndash;15), <code>fx</code> is the note effect (0&ndash;15). <code>speed</code> is ticks per note (default 8). <code>scope_ch</code> (1&ndash;8) enables waveform capture for <code>scope_read</code>. Returns the mixer channel number, or -1 on failure. Max 32 notes, 16 concurrent synths.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">synth_fx</span>(<span class="fn-param">notes</span>, <span class="fn-opt">[speed]</span>, <span class="fn-opt">[effects]</span>, <span class="fn-opt">[channel_hint]</span>)</div>
+          <div class="fn-ret">&rarr; integer</div>
+          <div class="fn-desc">Like <code>synth()</code> but with a real-time effects chain. <code>effects</code> is an array of up to 3 effect tables <code>{type, p1, p2, p3, p4}</code>. Effect types: 1=EQ3, 2=Bitcrush, 3=Reverb, 4=Delay, 5=Limiter. Params are 0&ndash;15. <code>channel_hint</code> (1&ndash;8) enables persistent effect state and scope capture.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">synth_stop</span>(<span class="fn-param">channel</span>)</div>
+          <div class="fn-desc">Stop a synth playing on the given mixer channel (returned by <code>synth()</code> or <code>synth_fx()</code>).</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">synth_set_fx</span>(<span class="fn-param">tracker_ch</span>, <span class="fn-opt">[effects]</span>)</div>
+          <div class="fn-desc">Update effects on a playing synth in real-time. <code>tracker_ch</code> is the channel hint (1&ndash;8) passed to <code>synth_fx()</code>. Pass nil or empty table to clear effects.</div>
+        </div>
+      </div>
+
+      <!-- SCOPE -->
+      <div class="section" id="scope">
+        <h2>SCOPE</h2>
+        <div class="note">Read live audio waveform and frequency data from synth channels. Useful for visualizers and spectrum displays.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">scope_read</span>(<span class="fn-param">channel</span>, <span class="fn-opt">[count]</span>)</div>
+          <div class="fn-ret">&rarr; table</div>
+          <div class="fn-desc">Read recent waveform samples from a tracker channel (1&ndash;8). Returns an array of floats (-1.0 to 1.0), oldest first. <code>count</code> defaults to 128, max 512. Returns empty table if no recent audio.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">scope_fft</span>(<span class="fn-param">channel</span>, <span class="fn-opt">[num_bins]</span>)</div>
+          <div class="fn-ret">&rarr; table</div>
+          <div class="fn-desc">Compute frequency spectrum from a tracker channel (1&ndash;8). Returns an array of magnitudes (0.0 to 1.0), low frequencies first. <code>num_bins</code> defaults to 64, max 256. Returns empty table if no recent audio.</div>
+        </div>
+      </div>
+
       <!-- TABLE UTILITIES -->
       <div class="section" id="tables">
         <h2>TABLE UTILITIES</h2>
@@ -1849,6 +1894,11 @@ draw_card()
           <div class="fn-sig"><span class="fn-name">get_window_title</span>() / <span class="fn-name">set_window_title</span>(<span class="fn-param">title</span>)</div>
           <div class="fn-desc">Window title control</div>
         </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">get_window_scale</span>() / <span class="fn-name">set_window_scale</span>(<span class="fn-param">scale</span>)</div>
+          <div class="fn-ret">&rarr; integer</div>
+          <div class="fn-desc">Get or set the window scale factor (1&ndash;10). Ignored in fullscreen.</div>
+        </div>
       </div>
 
       <!-- TIME -->
@@ -2059,6 +2109,109 @@ draw_card()
         <div class="fn">
           <div class="fn-sig"><span class="fn-name">preview_send</span>(<span class="fn-param">data</span>)</div>
           <div class="fn-desc">Send a message from inside a preview script back to the editor</div>
+        </div>
+      </div>
+
+      <!-- TESTING -->
+      <div class="section" id="testing">
+        <h2>TESTING</h2>
+        <div class="note">Built-in unit testing framework. Create test files as Dino8 projects and run them with <code>dino8 tests/my-test/</code>. Tests auto-run on load.</div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">test</span>(<span class="fn-param">name</span>, <span class="fn-param">fn</span>)</div>
+          <div class="fn-desc">Register a named test case. <code>fn</code> is called with no arguments.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_eq</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>)</div>
+          <div class="fn-desc">Assert two values are equal. Deep-compares tables recursively.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_not_eq</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>)</div>
+          <div class="fn-desc">Assert two values are not equal.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_true</span>(<span class="fn-param">value</span>) / <span class="fn-name">assert_false</span>(<span class="fn-param">value</span>)</div>
+          <div class="fn-desc">Assert a value is truthy or falsy.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_nil</span>(<span class="fn-param">value</span>) / <span class="fn-name">assert_not_nil</span>(<span class="fn-param">value</span>)</div>
+          <div class="fn-desc">Assert a value is or is not nil.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_near</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>, <span class="fn-opt">[epsilon]</span>)</div>
+          <div class="fn-desc">Assert two numbers are approximately equal. <code>epsilon</code> defaults to 0.0001.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_gt</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>) / <span class="fn-name">assert_gte</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>)</div>
+          <div class="fn-desc">Assert a number is greater than (or equal to) another.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_lt</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>) / <span class="fn-name">assert_lte</span>(<span class="fn-param">actual</span>, <span class="fn-param">expected</span>)</div>
+          <div class="fn-desc">Assert a number is less than (or equal to) another.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_error</span>(<span class="fn-param">fn</span>, <span class="fn-opt">[msg]</span>)</div>
+          <div class="fn-desc">Assert a function throws an error. If <code>msg</code> is provided, the error must contain that substring.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_contains</span>(<span class="fn-param">tbl</span>, <span class="fn-param">value</span>)</div>
+          <div class="fn-desc">Assert a sequential table contains a value. Uses deep equality.</div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig"><span class="fn-name">assert_type</span>(<span class="fn-param">value</span>, <span class="fn-param">expected_type</span>)</div>
+          <div class="fn-desc">Assert a value has the expected type (e.g. "string", "number", "table").</div>
+        </div>
+      </div>
+
+      <!-- FILE FORMATS -->
+      <div class="section" id="file-formats">
+        <h2>FILE FORMATS</h2>
+        <div class="note">Dino8 uses <code>.d8s</code> files for editor-created assets. These are Lua tables that get loaded at startup.</div>
+
+        <h3>audio.d8s</h3>
+        <div class="fn">
+          <div class="fn-desc">
+            Created by the integrated music editor. Contains synthesized sound effects and tracker songs. Referenced in <code>conf.d8</code> or auto-loaded from <code>assets/audio.d8s</code>.
+          </div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig">Structure</div>
+          <div class="fn-desc"><pre><code>return {
+  sfx = {
+    [1] = "08:245300000029500...",  -- encoded SFX
+  },
+  music = {
+    [1] = {
+      tempo = 120,
+      key = 0,              -- musical key (0-11, C to B)
+      sections = { ... },   -- encoded section patterns
+      sequence = "0000,...", -- playback order
+      tags = "...",          -- section labels
+    },
+  },
+}</code></pre>
+            Each SFX is a hex string: <code>SS:PPVWF...</code> where SS=speed, PP=pitch (0&ndash;63), V=volume (0&ndash;7), W=wave, F=effect. Each SFX has up to 32 notes.
+            Songs contain sections with per-channel note patterns, volume automation, and an effects chain. The sequence table controls playback order.
+          </div>
+        </div>
+
+        <h3>graphics.d8s</h3>
+        <div class="fn">
+          <div class="fn-desc">
+            Created by the integrated sprite editor. Contains named sprite sheets with RLE-compressed pixel data and a palette. Referenced via the <code>sprites</code> field in <code>conf.d8</code>.
+          </div>
+        </div>
+        <div class="fn">
+          <div class="fn-sig">Structure</div>
+          <div class="fn-desc"><pre><code>return {
+  version = 2,
+  palette = {0xFF0000, 0x00FF00, ...},
+  ["sprites"] = {
+    w = 128, h = 128,
+    data = ".ff..ff.~3~f~4~...",  -- RLE pixel data
+  },
+}</code></pre>
+            Pixels are encoded as single characters mapped to palette indices. Runs of 3+ identical pixels use RLE: <code>char~count~</code>. A <code>.</code> represents transparent pixels.
+          </div>
         </div>
       </div>
 
